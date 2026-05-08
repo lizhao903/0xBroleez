@@ -14,10 +14,14 @@
 
 from __future__ import annotations
 
+import datetime as dt
+import os
 import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+
+CN_TZ = dt.timezone(dt.timedelta(hours=8))
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 STRATEGY_LIB = Path("/Volumes/ai/github/Strategy-Lib")
@@ -87,6 +91,48 @@ def extract_section(body: str, heading: str) -> str:
     pattern = rf"^##\s+{re.escape(heading)}\s*\n(.*?)(?=^##\s|\Z)"
     m = re.search(pattern, body, re.DOTALL | re.MULTILINE)
     return m.group(1).strip() if m else ""
+
+
+def parse_date_loose(s: str) -> dt.date | None:
+    """从字符串里抓出 YYYY-MM-DD 部分；TBD / 空 → None。"""
+    if not s:
+        return None
+    if s.strip().upper() == "TBD":
+        return None
+    m = re.search(r"(\d{4})-(\d{1,2})-(\d{1,2})", s)
+    if not m:
+        return None
+    try:
+        return dt.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    except ValueError:
+        return None
+
+
+def compute_post_datetime(
+    version: str, created: str, finalized: str, fallback_path: Path
+) -> str:
+    """计算文章的 frontmatter date（决定首页倒序）。
+
+    策略：
+    - 日期部分：finalized > created（用户在 frontmatter 显式声明的）
+    - 时间部分：用 conclusion.md 的 mtime 的"当天时-分-秒"
+      → 同一天内，新写的 conclusion 排在前面（自然时序）
+    - 如果 finalized/created 都缺失，整体回退到 mtime 完整日期+时间
+    保证：新版本/新策略只要 conclusion 写得晚就自动靠前，无需手填精确时间。
+    """
+    base_date = parse_date_loose(finalized) or parse_date_loose(created)
+    mtime_dt = dt.datetime.fromtimestamp(os.path.getmtime(fallback_path), tz=CN_TZ)
+
+    if base_date is None:
+        return mtime_dt.isoformat(timespec="seconds")
+
+    # 把 mtime 的时-分-秒拼到 base_date 上
+    combined = dt.datetime(
+        base_date.year, base_date.month, base_date.day,
+        mtime_dt.hour, mtime_dt.minute, mtime_dt.second,
+        tzinfo=CN_TZ,
+    )
+    return combined.isoformat(timespec="seconds")
 
 
 def first_nonempty_line(text: str) -> str:
@@ -272,10 +318,14 @@ def build_post(entry: VersionEntry, siblings: list[VersionEntry]) -> tuple[str, 
     status_emoji = STATUS_EMOJI[status_kind]
     summary_with_emoji = f"{status_emoji} {entry.one_liner}"
 
+    post_datetime = compute_post_datetime(
+        entry.version, entry.created, finalized, entry.summary_dir / "conclusion.md"
+    )
+
     fm_lines = [
         "---",
         f'title: "{display_title}"',
-        f"date: {entry.created}T09:00:00+08:00",
+        f"date: {post_datetime}",
         "draft: false",
         f'summary: "{summary_with_emoji}"',
         f"tags: {tags}",

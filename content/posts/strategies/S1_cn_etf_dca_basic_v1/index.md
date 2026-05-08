@@ -1,6 +1,6 @@
 ---
 title: "基础 DCA（货币基金 + 风险资产池等额定投）"
-date: 2026-05-08T09:00:00+08:00
+date: 2026-05-08T14:08:52+08:00
 draft: false
 summary: "⏳ 在 2020-01 ~ 2024-12 的 A股 ETF 真实样本上，基础 DCA 跑输 510300 BH（CAGR -2.25% vs +0.86%，超额 -14.54%）；"
 tags: ['策略复盘', 'dca', 'benchmark', 'etf', 'passive']

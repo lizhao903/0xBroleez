@@ -1,6 +1,6 @@
 ---
 title: "A股 ETF 等权 + 动量倾斜（v2 — 扩池 + shift(1) + 长 lookback + vol-adjust） · v2"
-date: 2026-05-08T09:00:00+08:00
+date: 2026-05-08T14:48:55+08:00
 draft: false
 summary: "✅ **v2 的改进显著有效**（CAGR +5.73pp / Sharpe ×3.7 / MaxDD 减半 vs v1，且首次跑赢 510300 BH +2.6%/yr），**但收益主要来自「扩池 6 → 11」对 S3 baseline 的提升，动量 tilt 信号本身仍未带来 alpha**（v2 vs S3-11 IR=-0.17，α 敏感性中 α=0 仍是最优档）。**Ship v2 配置**，但备注「价值在跨资产分散，而非动量」；status 为 **shipped (pool value, not factor value)**。"
 tags: ['策略复盘', 'momentum', 'rebalance', 'tilt', 'etf', 'cross-asset', 'benchmark_suite_v1', 'v2']

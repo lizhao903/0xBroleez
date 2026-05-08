@@ -1,6 +1,6 @@
 ---
 title: "A股 ETF 等权 + 趋势倾斜 · v1"
-date: 2026-05-08T09:00:00+08:00
+date: 2026-05-08T14:13:34+08:00
 draft: false
 summary: "❌ **边际有效但不及预期：搁置（shelved）**。在 2020-2024 样本期 S5 总收益 +20.26% 优于 S3 (+10.80%) 和 510300 BH (+4.18%)，Sharpe 也更高 (0.28 vs 0.21 vs 0.15)，但**核心命题「下行保护」未兑现**——2022 单年 S5 -21.61% 与 BH -21.68% 几乎完全重合，超额主要来自 2024 单年的板块行情。"
 tags: ['策略复盘', 'benchmark', 'rebalance', 'trend', 'allocation', 'time-series-momentum']

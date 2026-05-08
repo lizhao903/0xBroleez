@@ -1,6 +1,6 @@
 ---
 title: "A股 ETF DCA + 阈值再平衡（做T） · v1"
-date: 2026-05-08T09:00:00+08:00
+date: 2026-05-08T14:09:35+08:00
 draft: false
 summary: "❌ S2 在 2020-2024 跑出 +1.11% 年化 alpha、信息比率 0.11、最大回撤优于 BH 7.6 pct，"
 tags: ['策略复盘', 'dca', 'rebalance', 'threshold', 'swing', 'cn_etf', 'benchmark_v1']

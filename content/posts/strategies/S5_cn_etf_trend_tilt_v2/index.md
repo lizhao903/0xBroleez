@@ -1,6 +1,6 @@
 ---
 title: "A股 ETF 等权 + 趋势倾斜（连续现金 + 波动率过滤 + 债券暴露） · v2"
-date: 2026-05-08T09:00:00+08:00
+date: 2026-05-08T14:49:21+08:00
 draft: false
 summary: "❌ **避险命题数据上兑现（MaxDD -47.8% → -20.5%，2022 -21.6% → -7.6%），但 Sharpe 与 v1 持平、CAGR 倒退 1.35 pct/yr，且 bond overlay 占用 37% 平均仓位让策略漂移成「股债混合」**——v2 实现了「保守型变体」但没有产生新 alpha。状态：**shelved**（保留代码作为 v1 的 risk profile 对照，不推荐替代 v1）。"
 tags: ['策略复盘', 'benchmark', 'rebalance', 'trend', 'allocation', 'time-series-momentum', 'vol-target', 'defensive']

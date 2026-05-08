@@ -1,6 +1,6 @@
 ---
 title: "A股 ETF DCA + 阈值再平衡 V2（DCA 优先回流 + 波动率自适应阈值） · v2"
-date: 2026-05-08T09:00:00+08:00
+date: 2026-05-08T14:46:04+08:00
 draft: false
 summary: "❌ 「停 DCA 灌入」无法治愈 v1 的高抛/低吸不对称——根因是 5 年里 6 只 ETF 整体偏多头 + 资金长期占在风险池，"
 tags: ['策略复盘', 'dca', 'rebalance', 'threshold', 'swing', 'cn_etf', 'benchmark_v1', 'asymmetric_fix', 'vol_adaptive']
