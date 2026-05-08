@@ -1,7 +1,7 @@
 baseURL = "https://lizhao903.github.io/0xBroleez/"
 languageCode = "zh-cn"
 defaultContentLanguage = "zh-cn"
-title = "0xBroleez 的博客"
+title = "0xBroleez 的日记"
 theme = "PaperMod"
 
 # 在子路径下部署，需要保持 baseURL 末尾的斜杠
@@ -70,7 +70,7 @@ buildExpired = false
 
   # 首页显示模式：posts 列表
   [params.homeInfoParams]
-    Title = "0xBroleez 的博客 👋"
+    Title = "0xBroleez 的日记 👋"
     Content = "记录项目实施过程中的思考、实践与复盘。"
 
   [params.assets]
