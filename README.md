@@ -160,15 +160,38 @@ git commit -m "chore: bump PaperMod"
 
 `/Volumes/ai/github/Strategy-Lib` 是策略研发的单一真相源。每个策略（`Sn_<slug>`）的 `ideas/` + `summaries/` 内容会被合并成博客里的一篇文章。
 
-**同步**：
+**同步（推荐）**：
 
 ```bash
+blog-sync           # 同步并显示变更（不提交）
+blog-sync --push    # 同步 + 自动 commit + push（一键发布）
+blog-sync --dry-run # 只看会发生什么
+```
+
+`bin/blog-sync` 是 wrapper 脚本，会自动定位项目根目录、跑 Python 同步、按需提交推送。**从任何目录都能跑**，前提是把 `bin/` 加进 PATH 或建个软链：
+
+```bash
+# 方式 A：加进 PATH（永久生效）
+echo 'export PATH="/Volumes/ai/github/0xBroleez/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# 方式 B：软链到 ~/bin（前提是 ~/bin 在 PATH）
+ln -s /Volumes/ai/github/0xBroleez/bin/blog-sync ~/bin/blog-sync
+
+# 方式 C：临时用绝对路径
+/Volumes/ai/github/0xBroleez/bin/blog-sync --push
+```
+
+**直接用 Python**（不通过 wrapper）：
+
+```bash
+cd /Volumes/ai/github/0xBroleez
 python3 scripts/sync_strategies.py
 ```
 
 脚本会做：
 
-1. 扫描 `Strategy-Lib/summaries/Sn_*/`，对每个策略找最新版本（`v1`、`v2` 中最大编号）
+1. 扫描 `Strategy-Lib/summaries/Sn_*/`，对每个策略**找最新且有 conclusion.md 的版本**（如果 v2 还在做、缺 conclusion.md，会回退到 v1）
 2. 读取该版本的 `idea.md` + `conclusion.md`（必需）和 `implementation.md` + `validation.md`（可选）
 3. 抽取关键段落（一句话概括 / 核心逻辑 / 假设依据 / 关键数据 / 教会我什么 / 图表）合并为单篇
 4. 长内容（`implementation.md` / `validation.md` 全文）放到 `<details>` 折叠

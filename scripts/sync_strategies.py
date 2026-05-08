@@ -52,13 +52,23 @@ def parse_frontmatter(text: str) -> Frontmatter:
     return Frontmatter(fields, body)
 
 
-def find_latest_version(strategy_dir: Path) -> Path | None:
-    """在 Sn_<slug>/ 下找版本号最大的 vN 目录。"""
+def find_latest_version(strategy_dir: Path, required_file: str | None = None) -> Path | None:
+    """在 Sn_<slug>/ 下找版本号最大的 vN 目录。
+
+    如果传入 required_file，只考虑包含该文件的版本——用于跳过仅有 artifacts/validate.py
+    的 work-in-progress 版本，回退到最近已完成的那一版。
+    """
     versions = sorted(
         (p for p in strategy_dir.iterdir() if p.is_dir() and re.match(r"^v\d+$", p.name)),
         key=lambda p: int(p.name[1:]),
+        reverse=True,
     )
-    return versions[-1] if versions else None
+    if required_file is None:
+        return versions[0] if versions else None
+    for v in versions:
+        if (v / required_file).exists():
+            return v
+    return None
 
 
 def extract_section(body: str, heading: str) -> str:
@@ -251,16 +261,25 @@ def sync() -> None:
             continue
         strategy_id = strategy_path.name
 
-        summary_v = find_latest_version(strategy_path)
-        if not summary_v or not (summary_v / "conclusion.md").exists():
-            skipped.append(f"{strategy_id} — summaries 没有 conclusion.md")
+        summary_v = find_latest_version(strategy_path, required_file="conclusion.md")
+        if not summary_v:
+            skipped.append(f"{strategy_id} — summaries 任一版本均没有 conclusion.md")
             continue
 
         idea_strategy_dir = IDEAS_DIR / strategy_id
-        idea_v = find_latest_version(idea_strategy_dir) if idea_strategy_dir.exists() else None
-        if not idea_v or not (idea_v / "idea.md").exists():
-            skipped.append(f"{strategy_id} — ideas 没有 idea.md")
+        idea_v = (
+            find_latest_version(idea_strategy_dir, required_file="idea.md")
+            if idea_strategy_dir.exists()
+            else None
+        )
+        if not idea_v:
+            skipped.append(f"{strategy_id} — ideas 任一版本均没有 idea.md")
             continue
+
+        # 优先用与 summary 同版本的 idea；如果不存在，用脚本选出的 idea 最新版
+        same_version_idea = idea_strategy_dir / summary_v.name / "idea.md"
+        if same_version_idea.exists():
+            idea_v = same_version_idea.parent
 
         post_dir = OUTPUT_DIR / strategy_id
         post_dir.mkdir(parents=True, exist_ok=True)

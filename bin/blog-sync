@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+#
+# blog-sync — 从 Strategy-Lib 同步策略复盘到博客并发布
+#
+# 用法：
+#   blog-sync              # 同步 + 显示变更（不提交）
+#   blog-sync --push       # 同步 + 自动 commit + push（一键发布）
+#   blog-sync --dry-run    # 只看会发生什么（不写文件）
+#
+# 不需要 cd 进项目，从任何位置运行都行。
+
+set -euo pipefail
+
+# 解析脚本所在位置 → 项目根目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+cd "$PROJECT_ROOT"
+
+PUSH=0
+DRY_RUN=0
+for arg in "$@"; do
+    case "$arg" in
+        -p|--push)     PUSH=1 ;;
+        -n|--dry-run)  DRY_RUN=1 ;;
+        -h|--help)
+            sed -n '3,11p' "$0" | sed 's/^# \?//'
+            exit 0
+            ;;
+        *)
+            echo "未知参数：$arg" >&2
+            exit 2
+            ;;
+    esac
+done
+
+bold()  { printf '\033[1m%s\033[0m\n' "$1"; }
+green() { printf '\033[32m%s\033[0m\n' "$1"; }
+yellow(){ printf '\033[33m%s\033[0m\n' "$1"; }
+red()   { printf '\033[31m%s\033[0m\n' "$1"; }
+
+bold "→ 项目：$PROJECT_ROOT"
+
+if [ "$DRY_RUN" -eq 1 ]; then
+    yellow "→ DRY-RUN 模式：只读取源文件，不写入"
+    # 暂存当前 strategies 目录的状态
+    BACKUP=$(mktemp -d)
+    if [ -d content/posts/strategies ]; then
+        cp -R content/posts/strategies "$BACKUP/"
+    fi
+fi
+
+bold "→ 运行 sync_strategies.py"
+python3 scripts/sync_strategies.py
+
+if [ "$DRY_RUN" -eq 1 ]; then
+    bold "→ 还原（dry-run）"
+    rm -rf content/posts/strategies
+    if [ -d "$BACKUP/strategies" ]; then
+        mv "$BACKUP/strategies" content/posts/
+    fi
+    rm -rf "$BACKUP"
+    green "✓ Dry-run 完成（实际未修改文件）"
+    exit 0
+fi
+
+# 检查变更
+if git diff --quiet content/posts/strategies/ 2>/dev/null && \
+   ! git status --porcelain content/posts/strategies/ | grep -q .; then
+    green "✓ 同步完成，无变更"
+    exit 0
+fi
+
+bold "→ 变更概览"
+git status --short content/posts/strategies/
+
+if [ "$PUSH" -eq 0 ]; then
+    cat <<EOF
+
+$(yellow "未提交。如要发布，请运行：")
+  $(bold "blog-sync --push")
+或手动：
+  git -C "$PROJECT_ROOT" add content/posts/strategies/
+  git -C "$PROJECT_ROOT" commit -m "post: 同步 Strategy-Lib"
+  git -C "$PROJECT_ROOT" push origin main
+EOF
+    exit 0
+fi
+
+# --push: 自动提交并推送
+bold "→ 检查远程是否有新提交（避免冲突）"
+git fetch origin main --quiet
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse @{u} 2>/dev/null || echo "")
+if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
+    BASE=$(git merge-base @ @{u})
+    if [ "$LOCAL" = "$BASE" ]; then
+        red "✗ 本地落后远程，需先 git pull --rebase。退出。"
+        exit 1
+    elif [ "$REMOTE" != "$BASE" ]; then
+        red "✗ 本地与远程已分叉，请手动处理。退出。"
+        exit 1
+    fi
+fi
+
+bold "→ 提交并推送"
+git add content/posts/strategies/
+COUNT=$(git diff --cached --name-only | grep -c '/index\.md$' || true)
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
+git commit -m "post: 同步 Strategy-Lib（$COUNT 篇 / $TIMESTAMP）" \
+           -m "由 bin/blog-sync 自动生成"
+git push origin main
+
+green "✓ 已发布。约 1 分钟后线上可见 https://lizhao903.github.io/0xBroleez/"
