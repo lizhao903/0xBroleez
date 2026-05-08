@@ -1,0 +1,20 @@
+# Hugo 构建产物
+/public/
+/resources/
+.hugo_build.lock
+
+# 本地配置覆盖
+/config.local.toml
+/hugo.local.toml
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+
+# Obsidian 工作区文件（如果把 content/ 当作 vault 使用）
+.obsidian/workspace*
+.obsidian/cache

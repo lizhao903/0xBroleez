@@ -1,0 +1,116 @@
+baseURL = "https://lizhao903.github.io/0xBroleez/"
+languageCode = "zh-cn"
+defaultContentLanguage = "zh-cn"
+title = "0xBroleez 的博客"
+theme = "PaperMod"
+
+# 在子路径下部署，需要保持 baseURL 末尾的斜杠
+canonifyURLs = false
+relativeURLs = false
+
+# 启用代码高亮、Emoji、首页摘要
+enableEmoji = true
+enableRobotsTXT = true
+buildDrafts = false
+buildFuture = false
+buildExpired = false
+
+# 分页（首页/标签页每页文章数）
+[pagination]
+  pagerSize = 10
+
+# 永久链接：让 URL 包含日期和 slug
+[permalinks]
+  posts = "/posts/:year/:month/:slug/"
+
+# 中文搜索分词需要 fuse.js，PaperMod 默认开启
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+# 代码高亮配置
+[markup]
+  [markup.highlight]
+    style = "github"
+    lineNos = false
+    codeFences = true
+    guessSyntax = true
+    noClasses = true
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true   # 允许 markdown 中嵌入原始 HTML（如视频、iframe）
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+    ordered = false
+
+[params]
+  env = "production"
+  description = "记录项目实施的思考与实践"
+  author = "0xBroleez"
+  defaultTheme = "auto"           # auto / light / dark
+  disableThemeToggle = false
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowWordCount = true
+  ShowRssButtonInSectionTermList = true
+  ShowToc = true
+  TocOpen = false
+  comments = false
+  hidemeta = false
+  hideSummary = false
+
+  # 首页显示模式：posts 列表
+  [params.homeInfoParams]
+    Title = "0xBroleez 的博客 👋"
+    Content = "记录项目实施过程中的思考、实践与复盘。"
+
+  [params.assets]
+    disableHLJS = true
+    favicon = "favicon.ico"
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/lizhao903"
+
+  [params.fuseOpts]
+    isCaseSensitive = false
+    shouldSort = true
+    location = 0
+    distance = 1000
+    threshold = 0.4
+    minMatchCharLength = 0
+    keys = ["title", "permalink", "summary", "content"]
+
+# 顶部菜单
+[[menu.main]]
+  identifier = "posts"
+  name = "文章"
+  url = "/posts/"
+  weight = 10
+
+[[menu.main]]
+  identifier = "archives"
+  name = "归档"
+  url = "/archives/"
+  weight = 20
+
+[[menu.main]]
+  identifier = "tags"
+  name = "标签"
+  url = "/tags/"
+  weight = 30
+
+[[menu.main]]
+  identifier = "categories"
+  name = "分类"
+  url = "/categories/"
+  weight = 40
+
+[[menu.main]]
+  identifier = "search"
+  name = "搜索"
+  url = "/search/"
+  weight = 50
