@@ -104,19 +104,8 @@ buildExpired = false
   weight = 20
 
 [[menu.main]]
-  identifier = "tags"
-  name = "标签"
-  url = "/tags/"
-  weight = 30
-
-[[menu.main]]
-  identifier = "categories"
-  name = "分类"
-  url = "/categories/"
-  weight = 40
-
-[[menu.main]]
   identifier = "search"
   name = "搜索"
   url = "/search/"
-  weight = 50
+  weight = 30
+# 标签和分类已通过首页右侧侧栏直接展示，不再放顶部菜单
