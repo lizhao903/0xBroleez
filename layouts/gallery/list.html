@@ -1,0 +1,45 @@
+{{- define "main" }}
+
+<header class="page-header">
+  <h1>{{ .Title }}</h1>
+  {{- if .Description }}
+  <div class="post-description">{{ .Description | markdownify }}</div>
+  {{- end }}
+</header>
+
+{{- if .Content }}
+<div class="post-content md-content">
+  {{ .Content }}
+</div>
+{{- end }}
+
+{{- $albums := .Pages }}
+{{- if $albums }}
+<div class="gallery-album-grid">
+  {{- range $albums.ByDate.Reverse }}
+  {{- $images := .Resources.ByType "image" }}
+  {{- $cover := index $images 0 }}
+  <a class="gallery-album-card" href="{{ .Permalink }}">
+    {{- if $cover }}
+    {{- $thumb := $cover.Fill "640x420" }}
+    <div class="album-cover" style="background-image: url('{{ $thumb.RelPermalink }}');"></div>
+    {{- else }}
+    <div class="album-cover album-cover-empty">📷</div>
+    {{- end }}
+    <div class="album-meta">
+      <h3 class="album-title">{{ .Title }}</h3>
+      {{- if .Summary }}
+      <p class="album-summary">{{ .Summary | plainify | truncate 80 }}</p>
+      {{- end }}
+      <p class="album-info">
+        {{ len $images }} 张 · {{ .Date.Format "2006-01-02" }}
+      </p>
+    </div>
+  </a>
+  {{- end }}
+</div>
+{{- else }}
+<p class="no-content"><em>还没有图集。在 <code>content/gallery/</code> 下新建一个文件夹试试。</em></p>
+{{- end }}
+
+{{- end }}{{/* end main */}}

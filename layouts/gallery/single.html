@@ -1,0 +1,42 @@
+{{- define "main" }}
+
+<article class="post-single gallery-single">
+  <header class="post-header">
+    {{- partial "breadcrumbs.html" . }}
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{- if .Description }}
+    <div class="post-description">{{ .Description }}</div>
+    {{- end }}
+    <div class="post-meta">
+      {{- partial "post_meta.html" . -}}
+    </div>
+  </header>
+
+  {{- if .Content }}
+  <div class="post-content md-content">
+    {{ .Content }}
+  </div>
+  {{- end }}
+
+  {{- $images := .Resources.ByType "image" }}
+  {{- if $images }}
+  <div class="gallery-photo-grid">
+    {{- range $images.ByName }}
+    {{- $thumb := .Fill "640x640 q85" }}
+    <a class="gallery-photo" href="{{ .RelPermalink }}" target="_blank" rel="noopener"
+       title="{{ .Name }}">
+      <img src="{{ $thumb.RelPermalink }}"
+           alt="{{ .Name }}"
+           loading="lazy"
+           width="{{ $thumb.Width }}"
+           height="{{ $thumb.Height }}">
+    </a>
+    {{- end }}
+  </div>
+  <p class="gallery-footer">{{ len $images }} 张图片 · 点击在新窗口看原图</p>
+  {{- else }}
+  <p class="no-content"><em>这个相册还没有图片。把图片文件直接放到 <code>{{ .File.Dir }}</code> 即可。</em></p>
+  {{- end }}
+</article>
+
+{{- end }}{{/* end main */}}

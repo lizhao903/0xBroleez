@@ -712,6 +712,122 @@ body {
     color: var(--accent);
 }
 
+/* ---------- 图集（gallery） ---------- */
+
+/* 相册列表页 */
+.gallery-album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin: 28px 0;
+}
+
+.gallery-album-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--entry);
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.gallery-album-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.album-cover {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--code-block-bg);
+}
+
+.album-cover-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    opacity: 0.4;
+}
+
+.album-meta {
+    padding: 14px 18px 16px;
+}
+
+.album-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: var(--primary);
+}
+
+.album-summary {
+    font-size: 13.5px;
+    color: var(--secondary);
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.album-info {
+    font-size: 12.5px;
+    color: var(--secondary);
+    margin: 0;
+}
+
+/* 单个相册的照片网格 */
+.gallery-single .post-content {
+    max-width: 100% !important;  /* 覆盖 post-single 的 760 限制 */
+}
+
+.gallery-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 24px 0;
+}
+
+.gallery-photo {
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--code-block-bg);
+    text-decoration: none !important;
+    border: none !important;
+}
+
+.gallery-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.gallery-photo:hover img {
+    transform: scale(1.04);
+}
+
+.gallery-footer {
+    text-align: center;
+    color: var(--secondary);
+    font-size: 13px;
+    margin-top: 18px;
+}
+
+.no-content {
+    color: var(--secondary);
+    text-align: center;
+    padding: 40px 0;
+}
+
 /* ---------- 移动端 ---------- */
 @media (max-width: 960px) {
     .home-grid {

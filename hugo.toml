@@ -53,6 +53,8 @@ buildExpired = false
   env = "production"
   description = "记录项目实施的思考与实践"
   author = "0xBroleez"
+  # 首页文章列表包含的 section（按需加 running、其他自定义 section）
+  mainSections = ["posts", "running"]
   defaultTheme = "auto"           # auto / light / dark
   disableThemeToggle = false
   ShowReadingTime = true
@@ -96,6 +98,18 @@ buildExpired = false
   name = "文章"
   url = "/posts/"
   weight = 10
+
+[[menu.main]]
+  identifier = "running"
+  name = "跑步"
+  url = "/running/"
+  weight = 15
+
+[[menu.main]]
+  identifier = "gallery"
+  name = "图集"
+  url = "/gallery/"
+  weight = 18
 
 [[menu.main]]
   identifier = "archives"
