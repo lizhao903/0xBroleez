@@ -160,13 +160,41 @@ git commit -m "chore: bump PaperMod"
 
 `/Volumes/ai/github/Strategy-Lib` 是策略研发的单一真相源。每个策略（`Sn_<slug>`）的 `ideas/` + `summaries/` 内容会被合并成博客里的一篇文章。
 
-**同步（推荐）**：
+**两个 CLI 工具**：
+
+| 命令 | 用途 |
+|---|---|
+| **`blog-publish`** | **任意内容更新都用它**（跑步/图集/术语/主题/配置/手写文章…）。默认会先同步 Strategy-Lib，再把所有改动 commit + push。一站式。 |
+| `blog-sync` | 只同步策略：跑 `sync_strategies.py` 把 Strategy-Lib 的内容拉到博客。`--push` 时只 commit `content/posts/strategies/`，其他改动不会动。 |
+
+**日常用法**：
 
 ```bash
-blog-sync           # 同步并显示变更（不提交）
-blog-sync --push    # 同步 + 自动 commit + push（一键发布）
-blog-sync --dry-run # 只看会发生什么
+# 写跑步日志、改 CSS、加术语条目、写策略… 任何内容动了，一句话上线：
+blog-publish
+
+# 自定义 commit message：
+blog-publish -m "running: 周末 15K 长距离"
+
+# 只看会发生什么不动手：
+blog-publish --dry-run
+
+# 只 commit 不 push（push 时机自己控制）：
+blog-publish --no-push
+
+# 跳过策略同步（默认会先跑一次 Strategy-Lib 同步）：
+blog-publish --no-sync
 ```
+
+**纯策略同步（不一定要发布）**：
+
+```bash
+blog-sync           # 同步并显示变更，不提交
+blog-sync --push    # 同步 + 提交 + 推送（仅策略目录）
+blog-sync --dry-run # 只看会同步什么
+```
+
+> 一般场景直接用 `blog-publish` 就够了。`blog-sync` 是底层工具，`blog-publish` 内部也调用它。
 
 `bin/blog-sync` 是 wrapper 脚本，会自动定位项目根目录、跑 Python 同步、按需提交推送。**从任何目录都能跑**，前提是把 `bin/` 加进 PATH 或建个软链：
 
