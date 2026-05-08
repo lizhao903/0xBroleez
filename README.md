@@ -153,3 +153,44 @@ git submodule update --remote --merge themes/PaperMod
 git add themes/PaperMod
 git commit -m "chore: bump PaperMod"
 ```
+
+---
+
+## 从 Strategy-Lib 同步策略复盘
+
+`/Volumes/ai/github/Strategy-Lib` 是策略研发的单一真相源。每个策略（`Sn_<slug>`）的 `ideas/` + `summaries/` 内容会被合并成博客里的一篇文章。
+
+**同步**：
+
+```bash
+python3 scripts/sync_strategies.py
+```
+
+脚本会做：
+
+1. 扫描 `Strategy-Lib/summaries/Sn_*/`，对每个策略找最新版本（`v1`、`v2` 中最大编号）
+2. 读取该版本的 `idea.md` + `conclusion.md`（必需）和 `implementation.md` + `validation.md`（可选）
+3. 抽取关键段落（一句话概括 / 核心逻辑 / 假设依据 / 关键数据 / 教会我什么 / 图表）合并为单篇
+4. 长内容（`implementation.md` / `validation.md` 全文）放到 `<details>` 折叠
+5. 生成 `content/posts/strategies/Sn_<slug>/index.md`，并把 `artifacts/*.png` 拷贝到同目录
+
+**写作约定**：
+
+- 在 `Strategy-Lib` 里写源文件（idea / implementation / validation / conclusion）
+- 提交到 Strategy-Lib 后，回这里跑一次同步脚本
+- `git add content/posts/strategies/ && git commit && git push` 触发部署
+
+**修改了哪个文件需要重新同步？**
+
+| 改动 | 需要同步 |
+|---|---|
+| `ideas/Sn_xxx/vN/idea.md` | ✓ |
+| `summaries/Sn_xxx/vN/conclusion.md` | ✓ |
+| `summaries/Sn_xxx/vN/implementation.md` | ✓ |
+| `summaries/Sn_xxx/vN/validation.md` | ✓ |
+| `summaries/Sn_xxx/vN/artifacts/*.png` | ✓ |
+| `ideas/Sn_xxx/vN/notes.md` | ✗（脚本不读 notes） |
+
+**新增策略**：在 `Strategy-Lib` 里按 `Sn_<slug>/vN/` 结构建好文件，跑一次脚本即可，无需改博客代码。
+
+**临时不同步某个策略**：在该策略的 `summaries/Sn_*/vN/conclusion.md` 改名或删除，脚本会跳过。
