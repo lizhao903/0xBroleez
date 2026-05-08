@@ -105,9 +105,11 @@ fi
 
 bold "→ 提交并推送"
 git add content/posts/strategies/
+# 注：$VAR 紧贴中文全角字符（如 "（"）在 macOS bash 3.2 + set -u 下会把多字节
+# 字符当成变量名的一部分，必须用 ${VAR} 显式定界。
 COUNT=$(git diff --cached --name-only | grep -c '/index\.md$' || true)
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
-git commit -m "post: 同步 Strategy-Lib（$COUNT 篇 / $TIMESTAMP）" \
+git commit -m "post: 同步 Strategy-Lib（${COUNT} 篇 / ${TIMESTAMP}）" \
            -m "由 bin/blog-sync 自动生成"
 git push origin main
 
