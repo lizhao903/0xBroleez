@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+#
+# blog-publish — 一键更新博客内容并推送
+#
+# 不只针对策略，覆盖所有手写内容：跑步 / 图集 / 术语 / 主题 / 配置。
+# 默认会先跑一次策略同步（无 Strategy-Lib 变更则空操作），
+# 然后把博客仓库下所有改动 commit + push。
+#
+# 用法：
+#   blog-publish                      # 默认：sync + add + commit + push
+#   blog-publish -m "running: 周末长跑" # 自定义 commit message
+#   blog-publish --no-push            # 只 commit 不 push
+#   blog-publish --no-sync            # 跳过 Strategy-Lib 同步
+#   blog-publish --dry-run            # 预览：show 会改什么但不写
+#   blog-publish -h                   # 帮助
+#
+# 不需要 cd 进项目，从任何位置都能跑。
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+CUSTOM_MSG=""
+PUSH=1
+SYNC=1
+DRY_RUN=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -m|--message)
+            shift
+            CUSTOM_MSG="${1:-}"
+            ;;
+        --no-push)     PUSH=0 ;;
+        --no-sync)     SYNC=0 ;;
+        -n|--dry-run)  DRY_RUN=1 ;;
+        -h|--help)
+            sed -n '3,18p' "$0" | sed 's/^# \?//'
+            exit 0
+            ;;
+        *)
+            echo "未知参数：$1" >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+bold()   { printf '\033[1m%s\033[0m\n' "$1"; }
+green()  { printf '\033[32m%s\033[0m\n' "$1"; }
+yellow() { printf '\033[33m%s\033[0m\n' "$1"; }
+red()    { printf '\033[31m%s\033[0m\n' "$1"; }
+
+bold "→ 项目：${PROJECT_ROOT}"
+
+# 1) Strategy-Lib 同步（可关）
+if [ "$SYNC" -eq 1 ] && [ -f scripts/sync_strategies.py ]; then
+    bold "→ 同步 Strategy-Lib"
+    python3 scripts/sync_strategies.py
+fi
+
+# 2) 暂存所有内容相关改动（不含 themes/ submodule、不含 public/ 等忽略文件）
+bold "→ 暂存改动"
+TRACKED_DIRS=(content assets layouts archetypes scripts bin .github)
+for d in "${TRACKED_DIRS[@]}"; do
+    [ -d "$d" ] && git add -A "$d"
+done
+# 顶层文件按需加
+for f in hugo.toml README.md .gitignore; do
+    [ -f "$f" ] && git add -A "$f"
+done
+
+# 3) 检查是否真的有变更
+if git diff --cached --quiet; then
+    green "✓ 没有需要提交的改动"
+    exit 0
+fi
+
+# 4) 显示概览
+bold "→ 待提交文件"
+git diff --cached --name-status | sed 's/^/  /'
+
+if [ "$DRY_RUN" -eq 1 ]; then
+    yellow "✓ Dry-run：未实际 commit/push"
+    git reset --quiet
+    exit 0
+fi
+
+# 5) 生成 commit message
+if [ -n "$CUSTOM_MSG" ]; then
+    MSG="$CUSTOM_MSG"
+else
+    # 自动按改动文件归类生成消息
+    CHANGED=$(git diff --cached --name-only)
+    SCOPE=""
+    if echo "$CHANGED" | grep -q '^content/posts/strategies/'; then SCOPE="${SCOPE}+strategies"; fi
+    if echo "$CHANGED" | grep -q '^content/running/';            then SCOPE="${SCOPE}+running"; fi
+    if echo "$CHANGED" | grep -q '^content/gallery/';            then SCOPE="${SCOPE}+gallery"; fi
+    if echo "$CHANGED" | grep -q '^content/posts/'              | grep -v '^content/posts/strategies/' >/dev/null 2>&1; then SCOPE="${SCOPE}+posts"; fi
+    if echo "$CHANGED" | grep -q '^content/glossary.md$';        then SCOPE="${SCOPE}+glossary"; fi
+    if echo "$CHANGED" | grep -qE '^(assets|layouts|hugo.toml)'; then SCOPE="${SCOPE}+theme"; fi
+    if echo "$CHANGED" | grep -qE '^(scripts|bin)/';             then SCOPE="${SCOPE}+tooling"; fi
+    SCOPE="${SCOPE#+}"
+    [ -z "$SCOPE" ] && SCOPE="content"
+
+    COUNT=$(echo "$CHANGED" | grep -c . || true)
+    TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
+    MSG="update(${SCOPE}): 内容更新（${COUNT} 文件 / ${TIMESTAMP}）"
+fi
+
+# 6) 检查远程同步
+bold "→ 检查远程"
+git fetch origin main --quiet
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse '@{u}' 2>/dev/null || echo "")
+if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
+    BASE=$(git merge-base @ '@{u}')
+    if [ "$LOCAL" = "$BASE" ]; then
+        red "✗ 本地落后远程，先跑 git pull --rebase。退出。"
+        exit 1
+    elif [ "$REMOTE" != "$BASE" ]; then
+        red "✗ 本地与远程已分叉，请手动处理。退出。"
+        exit 1
+    fi
+fi
+
+# 7) Commit
+bold "→ 提交：${MSG}"
+git commit -m "${MSG}" -m "由 bin/blog-publish 生成"
+
+# 8) Push（可关）
+if [ "$PUSH" -eq 1 ]; then
+    bold "→ 推送"
+    git push origin main
+    green "✓ 已发布。约 1 分钟后 https://lizhao903.github.io/0xBroleez/ 生效"
+else
+    yellow "✓ 已 commit，未 push（--no-push）"
+fi
