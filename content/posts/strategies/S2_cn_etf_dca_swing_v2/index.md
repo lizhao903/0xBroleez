@@ -14,7 +14,7 @@ TocOpen: false
 
 <div class="post-callout post-callout-negative">
 <span class="status-badge status-negative">❌ shelved</span> · 最终化：<code>2026-05-08</code>
-<br>来源：<code>Strategy-Lib/ideas/S2_cn_etf_dca_swing/v2</code> + <code>Strategy-Lib/summaries/S2_cn_etf_dca_swing/v2</code>
+<br>源码：<a href="https://github.com/lizhao903/Strategy-Lib/tree/main/ideas/S2_cn_etf_dca_swing/v2" target="_blank" rel="noopener"><code>ideas/S2_cn_etf_dca_swing/v2</code></a> + <a href="https://github.com/lizhao903/Strategy-Lib/tree/main/summaries/S2_cn_etf_dca_swing/v2" target="_blank" rel="noopener"><code>summaries/S2_cn_etf_dca_swing/v2</code></a>
 </div>
 
 <div class="versions-nav">
@@ -388,6 +388,16 @@ V2 不导入 v1 类。`DCASwingV2Strategy` 是独立类；`DCASwingV2Result` 是
 
 </details>
 
+## 源文件
+
+- [想法 · idea.md](https://github.com/lizhao903/Strategy-Lib/blob/main/ideas/S2_cn_etf_dca_swing/v2/idea.md)
+- [讨论笔记 · notes.md](https://github.com/lizhao903/Strategy-Lib/blob/main/ideas/S2_cn_etf_dca_swing/v2/notes.md)
+- [结论 · conclusion.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S2_cn_etf_dca_swing/v2/conclusion.md)
+- [实现 · implementation.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S2_cn_etf_dca_swing/v2/implementation.md)
+- [验证 · validation.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S2_cn_etf_dca_swing/v2/validation.md)
+- [可复跑脚本 · validate.py](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S2_cn_etf_dca_swing/v2/validate.py)
+- [本版本目录（含 artifacts）](https://github.com/lizhao903/Strategy-Lib/tree/main/summaries/S2_cn_etf_dca_swing/v2)
+
 ---
 
-*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 Strategy-Lib 同步生成。*
+*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 [Strategy-Lib](https://github.com/lizhao903/Strategy-Lib) 同步生成。*

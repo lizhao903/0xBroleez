@@ -14,7 +14,7 @@ TocOpen: false
 
 <div class="post-callout post-callout-negative">
 <span class="status-badge status-negative">❌ shelved</span> · 最终化：<code>2026-05-08</code>
-<br>来源：<code>Strategy-Lib/ideas/S7_cn_etf_market_ma_filter/v1</code> + <code>Strategy-Lib/summaries/S7_cn_etf_market_ma_filter/v1</code>
+<br>源码：<a href="https://github.com/lizhao903/Strategy-Lib/tree/main/ideas/S7_cn_etf_market_ma_filter/v1" target="_blank" rel="noopener"><code>ideas/S7_cn_etf_market_ma_filter/v1</code></a> + <a href="https://github.com/lizhao903/Strategy-Lib/tree/main/summaries/S7_cn_etf_market_ma_filter/v1" target="_blank" rel="noopener"><code>summaries/S7_cn_etf_market_ma_filter/v1</code></a>
 </div>
 
 <div class="versions-nav">
@@ -395,6 +395,16 @@ size_type="targetpercent" + cash_sharing=True`，与 S3/S4/S5 保持回测可比
 
 </details>
 
+## 源文件
+
+- [想法 · idea.md](https://github.com/lizhao903/Strategy-Lib/blob/main/ideas/S7_cn_etf_market_ma_filter/v1/idea.md)
+- [讨论笔记 · notes.md](https://github.com/lizhao903/Strategy-Lib/blob/main/ideas/S7_cn_etf_market_ma_filter/v1/notes.md)
+- [结论 · conclusion.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S7_cn_etf_market_ma_filter/v1/conclusion.md)
+- [实现 · implementation.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S7_cn_etf_market_ma_filter/v1/implementation.md)
+- [验证 · validation.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S7_cn_etf_market_ma_filter/v1/validation.md)
+- [可复跑脚本 · validate.py](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S7_cn_etf_market_ma_filter/v1/validate.py)
+- [本版本目录（含 artifacts）](https://github.com/lizhao903/Strategy-Lib/tree/main/summaries/S7_cn_etf_market_ma_filter/v1)
+
 ---
 
-*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 Strategy-Lib 同步生成。*
+*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 [Strategy-Lib](https://github.com/lizhao903/Strategy-Lib) 同步生成。*

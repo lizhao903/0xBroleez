@@ -14,7 +14,7 @@ TocOpen: false
 
 <div class="post-callout post-callout-positive">
 <span class="status-badge status-positive">✅ shipped (pool value, not factor value)</span> · 最终化：<code>2026-05-08</code>
-<br>来源：<code>Strategy-Lib/ideas/S4_cn_etf_momentum_tilt/v2</code> + <code>Strategy-Lib/summaries/S4_cn_etf_momentum_tilt/v2</code>
+<br>源码：<a href="https://github.com/lizhao903/Strategy-Lib/tree/main/ideas/S4_cn_etf_momentum_tilt/v2" target="_blank" rel="noopener"><code>ideas/S4_cn_etf_momentum_tilt/v2</code></a> + <a href="https://github.com/lizhao903/Strategy-Lib/tree/main/summaries/S4_cn_etf_momentum_tilt/v2" target="_blank" rel="noopener"><code>summaries/S4_cn_etf_momentum_tilt/v2</code></a>
 </div>
 
 <div class="versions-nav">
@@ -405,6 +405,16 @@ v2 比 v1 实质性改善，但因为两边池子不同，IR/TE 对比不严格 
 
 </details>
 
+## 源文件
+
+- [想法 · idea.md](https://github.com/lizhao903/Strategy-Lib/blob/main/ideas/S4_cn_etf_momentum_tilt/v2/idea.md)
+- [讨论笔记 · notes.md](https://github.com/lizhao903/Strategy-Lib/blob/main/ideas/S4_cn_etf_momentum_tilt/v2/notes.md)
+- [结论 · conclusion.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S4_cn_etf_momentum_tilt/v2/conclusion.md)
+- [实现 · implementation.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S4_cn_etf_momentum_tilt/v2/implementation.md)
+- [验证 · validation.md](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S4_cn_etf_momentum_tilt/v2/validation.md)
+- [可复跑脚本 · validate.py](https://github.com/lizhao903/Strategy-Lib/blob/main/summaries/S4_cn_etf_momentum_tilt/v2/validate.py)
+- [本版本目录（含 artifacts）](https://github.com/lizhao903/Strategy-Lib/tree/main/summaries/S4_cn_etf_momentum_tilt/v2)
+
 ---
 
-*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 Strategy-Lib 同步生成。*
+*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 [Strategy-Lib](https://github.com/lizhao903/Strategy-Lib) 同步生成。*
