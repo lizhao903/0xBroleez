@@ -5,6 +5,7 @@ draft: false
 summary: "在 2020-01 ~ 2024-12 的 A股 ETF 真实样本上，基础 DCA 跑输 510300 BH（CAGR -2.25% vs +0.86%，超额 -14.54%）；"
 tags: ['策略复盘', 'dca', 'benchmark', 'etf', 'passive']
 categories: ["策略复盘"]
+series: ["S1_cn_etf_dca_basic"]
 ShowToc: true
 TocOpen: false
 ---

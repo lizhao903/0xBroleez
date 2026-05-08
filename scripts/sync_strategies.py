@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
-从 Strategy-Lib 同步策略到博客：每个策略 = 一篇 Hugo Page Bundle。
+从 Strategy-Lib 同步策略到博客：每个 (策略, 版本) = 一篇 Hugo Page Bundle。
 
 源：/Volumes/ai/github/Strategy-Lib/{ideas,summaries}/Sn_<slug>/vN/
-目标：content/posts/strategies/Sn_<slug>/{index.md, *.png}
+目标：content/posts/strategies/Sn_<slug>_vN/{index.md, *.png}
+
+每篇文章顶部会自动生成「本策略其他版本」的链接区块，把 v1/v2/v3 串起来。
+
+只生成 summaries 里有 conclusion.md 的版本（v2 work-in-progress 没结论时不发布）。
 
 运行：python scripts/sync_strategies.py
 """
@@ -21,7 +25,6 @@ IDEAS_DIR = STRATEGY_LIB / "ideas"
 SUMMARIES_DIR = STRATEGY_LIB / "summaries"
 OUTPUT_DIR = REPO_ROOT / "content" / "posts" / "strategies"
 
-# 不同步的策略目录名
 SKIP = {"_template", "README.md"}
 
 
@@ -31,12 +34,24 @@ class Frontmatter:
     body: str
 
 
+@dataclass
+class VersionEntry:
+    """一个 (策略, 版本) 的全部源信息。"""
+
+    strategy_id: str   # e.g. S1_cn_etf_dca_basic
+    version: str       # e.g. v1
+    idea_dir: Path
+    summary_dir: Path
+    title: str
+    one_liner: str     # 一句话结论
+    status: str
+    created: str       # YYYY-MM-DD
+
+
 def parse_frontmatter(text: str) -> Frontmatter:
-    """解析 markdown 顶部 YAML frontmatter，返回 (字段 dict, body)。"""
     m = re.match(r"^---\n(.*?)\n---\n?(.*)$", text, re.DOTALL)
     if not m:
         return Frontmatter({}, text)
-
     raw, body = m.group(1), m.group(2)
     fields: dict[str, str | list[str]] = {}
     for line in raw.splitlines():
@@ -52,27 +67,15 @@ def parse_frontmatter(text: str) -> Frontmatter:
     return Frontmatter(fields, body)
 
 
-def find_latest_version(strategy_dir: Path, required_file: str | None = None) -> Path | None:
-    """在 Sn_<slug>/ 下找版本号最大的 vN 目录。
-
-    如果传入 required_file，只考虑包含该文件的版本——用于跳过仅有 artifacts/validate.py
-    的 work-in-progress 版本，回退到最近已完成的那一版。
-    """
-    versions = sorted(
+def list_versions(strategy_dir: Path) -> list[Path]:
+    """按版本号升序列出所有 vN 目录。"""
+    return sorted(
         (p for p in strategy_dir.iterdir() if p.is_dir() and re.match(r"^v\d+$", p.name)),
         key=lambda p: int(p.name[1:]),
-        reverse=True,
     )
-    if required_file is None:
-        return versions[0] if versions else None
-    for v in versions:
-        if (v / required_file).exists():
-            return v
-    return None
 
 
 def extract_section(body: str, heading: str) -> str:
-    """从 markdown body 抽取 `## heading` 直到下一个 `## ` 之间的内容（不含标题）。"""
     pattern = rf"^##\s+{re.escape(heading)}\s*\n(.*?)(?=^##\s|\Z)"
     m = re.search(pattern, body, re.DOTALL | re.MULTILINE)
     return m.group(1).strip() if m else ""
@@ -86,50 +89,135 @@ def first_nonempty_line(text: str) -> str:
     return ""
 
 
-def build_post(strategy_id: str, idea_dir: Path, summary_dir: Path) -> tuple[str, list[Path]]:
-    """生成 index.md 内容，返回 (markdown, [需拷贝的 artifact 路径])。"""
-    idea = parse_frontmatter((idea_dir / "idea.md").read_text(encoding="utf-8"))
-    conclusion_path = summary_dir / "conclusion.md"
-    conclusion = parse_frontmatter(conclusion_path.read_text(encoding="utf-8"))
-    impl_text = (summary_dir / "implementation.md").read_text(encoding="utf-8") if (summary_dir / "implementation.md").exists() else ""
-    valid_text = (summary_dir / "validation.md").read_text(encoding="utf-8") if (summary_dir / "validation.md").exists() else ""
+def collect_versions() -> list[VersionEntry]:
+    """扫描 Strategy-Lib，返回所有可发布的 (策略, 版本) 条目。"""
+    if not SUMMARIES_DIR.exists():
+        raise SystemExit(f"未找到 {SUMMARIES_DIR}")
 
-    title_raw = idea.fields.get("title") or strategy_id
-    title = title_raw if isinstance(title_raw, str) else " ".join(title_raw)
-    status = conclusion.fields.get("status") or idea.fields.get("status") or "unknown"
-    created = idea.fields.get("created") or "2026-01-01"
-    finalized = conclusion.fields.get("finalized") or "TBD"
+    entries: list[VersionEntry] = []
+    skipped: list[str] = []
 
-    idea_tags = idea.fields.get("tags") or []
-    tags = ["策略复盘"] + ([idea_tags] if isinstance(idea_tags, str) else idea_tags)
+    for strategy_path in sorted(SUMMARIES_DIR.iterdir()):
+        if not strategy_path.is_dir() or strategy_path.name in SKIP:
+            continue
+        strategy_id = strategy_path.name
 
-    # 摘要：取 conclusion 的"一句话结论"段落首句
-    one_liner_section = extract_section(conclusion.body, "一句话结论")
-    summary_line = first_nonempty_line(one_liner_section) or first_nonempty_line(idea.body)
-    summary_line = summary_line.replace('"', "'")[:280]
+        for summary_v in list_versions(strategy_path):
+            version = summary_v.name
+            conclusion_path = summary_v / "conclusion.md"
+            if not conclusion_path.exists():
+                skipped.append(f"{strategy_id}/{version} — 没有 conclusion.md")
+                continue
 
-    # 抽取 idea 的关键段落
-    idea_one = extract_section(idea.body, "一句话概括")
-    idea_what = extract_section(idea.body, "核心逻辑（What）")
-    idea_why = extract_section(idea.body, "假设与依据（Why）")
-    idea_universe = extract_section(idea.body, "标的与周期")
+            # 找对应版本的 idea；如果没有同版本，回退到该策略最新有 idea.md 的版本
+            idea_strategy_dir = IDEAS_DIR / strategy_id
+            idea_v: Path | None = None
+            same = idea_strategy_dir / version
+            if same.exists() and (same / "idea.md").exists():
+                idea_v = same
+            else:
+                # 从最新往旧找一个有 idea.md 的版本
+                if idea_strategy_dir.exists():
+                    for candidate in reversed(list_versions(idea_strategy_dir)):
+                        if (candidate / "idea.md").exists():
+                            idea_v = candidate
+                            break
+            if idea_v is None:
+                skipped.append(f"{strategy_id}/{version} — 找不到对应的 idea.md")
+                continue
 
-    # 抽取 conclusion 的关键段落
-    concl_one = one_liner_section
-    concl_data = extract_section(conclusion.body, "关键数据")
-    concl_when = extract_section(conclusion.body, "在什么情况下有效，什么情况下失效")
+            idea_fm = parse_frontmatter((idea_v / "idea.md").read_text(encoding="utf-8"))
+            concl_fm = parse_frontmatter(conclusion_path.read_text(encoding="utf-8"))
+            title_raw = idea_fm.fields.get("title") or strategy_id
+            title = title_raw if isinstance(title_raw, str) else " ".join(title_raw)
+
+            one_liner_section = extract_section(concl_fm.body, "一句话结论")
+            one_liner = first_nonempty_line(one_liner_section) or first_nonempty_line(idea_fm.body)
+            # 截断到 280 字符并清理不匹配的 markdown 标记，避免渲染串行
+            one_liner = one_liner.replace('"', "'")[:280]
+            # 去掉首尾不成对的 ** / * / ` 等
+            one_liner = re.sub(r"\*\*", "", one_liner) if one_liner.count("**") % 2 else one_liner
+            one_liner = re.sub(r"(?<!\*)\*(?!\*)", "", one_liner) if one_liner.count("*") % 2 else one_liner
+            one_liner = re.sub(r"`", "", one_liner) if one_liner.count("`") % 2 else one_liner
+
+            status_raw = concl_fm.fields.get("status") or idea_fm.fields.get("status") or "unknown"
+            status = status_raw if isinstance(status_raw, str) else " ".join(status_raw)
+
+            created_raw = idea_fm.fields.get("created") or "2026-01-01"
+            created = created_raw if isinstance(created_raw, str) else "2026-01-01"
+
+            entries.append(
+                VersionEntry(
+                    strategy_id=strategy_id,
+                    version=version,
+                    idea_dir=idea_v,
+                    summary_dir=summary_v,
+                    title=title,
+                    one_liner=one_liner,
+                    status=status,
+                    created=created,
+                )
+            )
+
+    if skipped:
+        for s in skipped:
+            print(f"  · 跳过 {s}")
+    return entries
+
+
+def render_versions_nav(current: VersionEntry, siblings: list[VersionEntry]) -> str:
+    """生成「本策略其他版本」区块的 markdown。"""
+    if len(siblings) <= 1:
+        return ""
+    lines = ["**本策略的其他版本**", ""]
+    for sib in siblings:
+        if sib.version == current.version:
+            lines.append(f"- **{sib.version}（本文）** — {sib.one_liner}")
+        else:
+            target = f"{sib.strategy_id}_{sib.version}"
+            link = f"[{sib.version}]({{{{< relref \"/posts/strategies/{target}/index.md\" >}}}})"
+            lines.append(f"- {link} — {sib.one_liner}")
+    return "\n".join(lines)
+
+
+def build_post(entry: VersionEntry, siblings: list[VersionEntry]) -> tuple[str, list[Path]]:
+    idea_text = (entry.idea_dir / "idea.md").read_text(encoding="utf-8")
+    conclusion_text = (entry.summary_dir / "conclusion.md").read_text(encoding="utf-8")
+    impl_text = (entry.summary_dir / "implementation.md").read_text(encoding="utf-8") if (entry.summary_dir / "implementation.md").exists() else ""
+    valid_text = (entry.summary_dir / "validation.md").read_text(encoding="utf-8") if (entry.summary_dir / "validation.md").exists() else ""
+
+    idea_fm = parse_frontmatter(idea_text)
+    concl_fm = parse_frontmatter(conclusion_text)
+
+    finalized_raw = concl_fm.fields.get("finalized") or "TBD"
+    finalized = finalized_raw if isinstance(finalized_raw, str) else " ".join(finalized_raw)
+
+    idea_tags = idea_fm.fields.get("tags") or []
+    if isinstance(idea_tags, str):
+        idea_tags = [idea_tags]
+    tags = ["策略复盘"] + idea_tags
+
+    # 多版本时把版本号加进 title 里区分
+    display_title = entry.title if len(siblings) <= 1 else f"{entry.title} · {entry.version}"
+
+    idea_one = extract_section(idea_fm.body, "一句话概括")
+    idea_what = extract_section(idea_fm.body, "核心逻辑（What）")
+    idea_why = extract_section(idea_fm.body, "假设与依据（Why）")
+    idea_universe = extract_section(idea_fm.body, "标的与周期")
+
+    concl_one = extract_section(concl_fm.body, "一句话结论")
+    concl_data = extract_section(concl_fm.body, "关键数据")
+    concl_when = extract_section(concl_fm.body, "在什么情况下有效，什么情况下失效")
     if not concl_when:
-        concl_when = extract_section(conclusion.body, "在什么情况下有效")
-    concl_lesson = extract_section(conclusion.body, "这个策略教会我什么（可迁移的经验）")
+        concl_when = extract_section(concl_fm.body, "在什么情况下有效")
+    concl_lesson = extract_section(concl_fm.body, "这个策略教会我什么（可迁移的经验）")
     if not concl_lesson:
-        concl_lesson = extract_section(conclusion.body, "这个策略教会我什么")
+        concl_lesson = extract_section(concl_fm.body, "这个策略教会我什么")
 
-    # 拷贝 artifacts 图片，按拼盘顺序生成 markdown 引用
-    artifacts_dir = summary_dir / "artifacts"
+    artifacts_dir = entry.summary_dir / "artifacts"
     image_files: list[Path] = []
     image_md = ""
     if artifacts_dir.exists():
-        # 偏好顺序：净值/回撤/权重/现金/分布等等，剩下的按字典序补
         preferred = ["equity_curve", "drawdown", "cash_vs_risk", "weights_stack"]
         all_imgs = sorted(p for p in artifacts_dir.glob("*.png"))
         ordered: list[Path] = []
@@ -143,27 +231,35 @@ def build_post(strategy_id: str, idea_dir: Path, summary_dir: Path) -> tuple[str
         image_files = ordered
         image_md = "\n\n".join(f"![{p.stem}]({p.name})" for p in image_files)
 
-    # 折叠区块的内容（去掉自带 frontmatter）
     impl_body = parse_frontmatter(impl_text).body.strip() if impl_text else ""
     valid_body = parse_frontmatter(valid_text).body.strip() if valid_text else ""
 
     fm_lines = [
         "---",
-        f'title: "{title}"',
-        f"date: {created}T09:00:00+08:00",
+        f'title: "{display_title}"',
+        f"date: {entry.created}T09:00:00+08:00",
         "draft: false",
-        f'summary: "{summary_line}"',
+        f'summary: "{entry.one_liner}"',
         f"tags: {tags}",
         'categories: ["策略复盘"]',
+        f'series: ["{entry.strategy_id}"]',
         "ShowToc: true",
         "TocOpen: false",
         "---",
     ]
 
     parts = ["\n".join(fm_lines), ""]
-    parts.append(f"> **状态**：`{status}` · **最终化**：`{finalized}`  ")
-    parts.append(f"> 来源：`Strategy-Lib/ideas/{strategy_id}/{idea_dir.name}` + `Strategy-Lib/summaries/{strategy_id}/{summary_dir.name}`")
+    parts.append(f"> **状态**：`{entry.status}` · **最终化**：`{finalized}`  ")
+    parts.append(
+        f"> 来源：`Strategy-Lib/ideas/{entry.strategy_id}/{entry.idea_dir.name}` "
+        f"+ `Strategy-Lib/summaries/{entry.strategy_id}/{entry.version}`"
+    )
     parts.append("")
+
+    nav = render_versions_nav(entry, siblings)
+    if nav:
+        parts.append(nav)
+        parts.append("")
 
     if idea_one:
         parts.append("## 想法（Why）")
@@ -242,7 +338,11 @@ def build_post(strategy_id: str, idea_dir: Path, summary_dir: Path) -> tuple[str
 
     parts.append("---")
     parts.append("")
-    parts.append("*本文由 [`scripts/sync_strategies.py`](https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) 从 Strategy-Lib 同步生成。*")
+    parts.append(
+        "*本文由 [`scripts/sync_strategies.py`]"
+        "(https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) "
+        "从 Strategy-Lib 同步生成。*"
+    )
     parts.append("")
 
     return "\n".join(parts), image_files
@@ -251,59 +351,48 @@ def build_post(strategy_id: str, idea_dir: Path, summary_dir: Path) -> tuple[str
 def sync() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    if not SUMMARIES_DIR.exists():
-        raise SystemExit(f"未找到 {SUMMARIES_DIR}")
+    entries = collect_versions()
+    if not entries:
+        print("没有可同步的策略版本（缺 conclusion.md 或 idea.md）")
+        return
 
-    synced = []
-    skipped = []
-    for strategy_path in sorted(SUMMARIES_DIR.iterdir()):
-        if not strategy_path.is_dir() or strategy_path.name in SKIP:
-            continue
-        strategy_id = strategy_path.name
+    # 按 strategy_id 分组
+    by_strategy: dict[str, list[VersionEntry]] = {}
+    for e in entries:
+        by_strategy.setdefault(e.strategy_id, []).append(e)
+    for siblings in by_strategy.values():
+        siblings.sort(key=lambda x: int(x.version[1:]))
 
-        summary_v = find_latest_version(strategy_path, required_file="conclusion.md")
-        if not summary_v:
-            skipped.append(f"{strategy_id} — summaries 任一版本均没有 conclusion.md")
-            continue
+    # 删除目标目录中所有不再属于本次同步集的旧 bundle
+    valid_dirs = {f"{e.strategy_id}_{e.version}" for e in entries}
+    if OUTPUT_DIR.exists():
+        for old in OUTPUT_DIR.iterdir():
+            if old.is_dir() and old.name not in valid_dirs:
+                shutil.rmtree(old)
+                print(f"  · 删除已废弃的 bundle: {old.name}")
 
-        idea_strategy_dir = IDEAS_DIR / strategy_id
-        idea_v = (
-            find_latest_version(idea_strategy_dir, required_file="idea.md")
-            if idea_strategy_dir.exists()
-            else None
-        )
-        if not idea_v:
-            skipped.append(f"{strategy_id} — ideas 任一版本均没有 idea.md")
-            continue
-
-        # 优先用与 summary 同版本的 idea；如果不存在，用脚本选出的 idea 最新版
-        same_version_idea = idea_strategy_dir / summary_v.name / "idea.md"
-        if same_version_idea.exists():
-            idea_v = same_version_idea.parent
-
-        post_dir = OUTPUT_DIR / strategy_id
+    synced: list[str] = []
+    for entry in entries:
+        siblings = by_strategy[entry.strategy_id]
+        bundle_name = f"{entry.strategy_id}_{entry.version}"
+        post_dir = OUTPUT_DIR / bundle_name
         post_dir.mkdir(parents=True, exist_ok=True)
 
-        # 清空旧图片（保留可能的手工添加文件不在范围内）
         for old_png in post_dir.glob("*.png"):
             old_png.unlink()
 
-        index_md, images = build_post(strategy_id, idea_v, summary_v)
+        index_md, images = build_post(entry, siblings)
         (post_dir / "index.md").write_text(index_md, encoding="utf-8")
 
         for img in images:
             shutil.copy2(img, post_dir / img.name)
 
-        synced.append(f"{strategy_id} ({idea_v.name}, {len(images)} 张图)")
+        synced.append(f"{bundle_name} ({len(images)} 张图)")
 
     print("=" * 60)
-    print(f"已同步 {len(synced)} 个策略：")
+    print(f"已同步 {len(synced)} 篇文章（{len(by_strategy)} 个策略）：")
     for s in synced:
         print(f"  ✓ {s}")
-    if skipped:
-        print(f"\n跳过 {len(skipped)} 个：")
-        for s in skipped:
-            print(f"  · {s}")
 
 
 if __name__ == "__main__":

@@ -1,16 +1,22 @@
 ---
-title: "A股 ETF DCA + 阈值再平衡（做T）"
+title: "A股 ETF DCA + 阈值再平衡（做T） · v1"
 date: 2026-05-08T09:00:00+08:00
 draft: false
 summary: "S2 在 2020-2024 跑出 +1.11% 年化 alpha、信息比率 0.11、最大回撤优于 BH 7.6 pct，"
 tags: ['策略复盘', 'dca', 'rebalance', 'threshold', 'swing', 'cn_etf', 'benchmark_v1']
 categories: ["策略复盘"]
+series: ["S2_cn_etf_dca_swing"]
 ShowToc: true
 TocOpen: false
 ---
 
 > **状态**：`shelved   # 真实数据回测已通，等 S1 出炉后再决定 shipped/rejected` · **最终化**：`2026-05-08 (preliminary)`  
 > 来源：`Strategy-Lib/ideas/S2_cn_etf_dca_swing/v1` + `Strategy-Lib/summaries/S2_cn_etf_dca_swing/v1`
+
+**本策略的其他版本**
+
+- **v1（本文）** — S2 在 2020-2024 跑出 +1.11% 年化 alpha、信息比率 0.11、最大回撤优于 BH 7.6 pct，
+- [v2]({{< relref "/posts/strategies/S2_cn_etf_dca_swing_v2/index.md" >}}) — 「停 DCA 灌入」无法治愈 v1 的高抛/低吸不对称——根因是 5 年里 6 只 ETF 整体偏多头 + 资金长期占在风险池，
 
 ## 想法（Why）
 

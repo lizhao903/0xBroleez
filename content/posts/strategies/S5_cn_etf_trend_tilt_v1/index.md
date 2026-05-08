@@ -1,16 +1,22 @@
 ---
-title: "A股 ETF 等权 + 趋势倾斜"
+title: "A股 ETF 等权 + 趋势倾斜 · v1"
 date: 2026-05-08T09:00:00+08:00
 draft: false
 summary: "**边际有效但不及预期：搁置（shelved）**。在 2020-2024 样本期 S5 总收益 +20.26% 优于 S3 (+10.80%) 和 510300 BH (+4.18%)，Sharpe 也更高 (0.28 vs 0.21 vs 0.15)，但**核心命题「下行保护」未兑现**——2022 单年 S5 -21.61% 与 BH -21.68% 几乎完全重合，超额主要来自 2024 单年的板块行情。"
 tags: ['策略复盘', 'benchmark', 'rebalance', 'trend', 'allocation', 'time-series-momentum']
 categories: ["策略复盘"]
+series: ["S5_cn_etf_trend_tilt"]
 ShowToc: true
 TocOpen: false
 ---
 
 > **状态**：`shelved  # 边际有效但下行保护未兑现；保留代码，参数/触发逻辑需迭代后再上` · **最终化**：`2026-05-08`  
 > 来源：`Strategy-Lib/ideas/S5_cn_etf_trend_tilt/v1` + `Strategy-Lib/summaries/S5_cn_etf_trend_tilt/v1`
+
+**本策略的其他版本**
+
+- **v1（本文）** — **边际有效但不及预期：搁置（shelved）**。在 2020-2024 样本期 S5 总收益 +20.26% 优于 S3 (+10.80%) 和 510300 BH (+4.18%)，Sharpe 也更高 (0.28 vs 0.21 vs 0.15)，但**核心命题「下行保护」未兑现**——2022 单年 S5 -21.61% 与 BH -21.68% 几乎完全重合，超额主要来自 2024 单年的板块行情。
+- [v2]({{< relref "/posts/strategies/S5_cn_etf_trend_tilt_v2/index.md" >}}) — **避险命题数据上兑现（MaxDD -47.8% → -20.5%，2022 -21.6% → -7.6%），但 Sharpe 与 v1 持平、CAGR 倒退 1.35 pct/yr，且 bond overlay 占用 37% 平均仓位让策略漂移成「股债混合」**——v2 实现了「保守型变体」但没有产生新 alpha。状态：**shelved**（保留代码作为 v1 的 risk profile 对照，不推荐替代 v1）。
 
 ## 想法（Why）
 

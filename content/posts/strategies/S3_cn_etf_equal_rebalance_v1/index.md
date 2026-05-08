@@ -5,6 +5,7 @@ draft: false
 summary: "6 只 A股 ETF 等权 + 月度再平衡 (period=20)，在 2020-01-01 ~ 2024-12-31 跑出"
 tags: ['策略复盘', 'benchmark', 'rebalance', 'equal_weight', 'allocation']
 categories: ["策略复盘"]
+series: ["S3_cn_etf_equal_rebalance"]
 ShowToc: true
 TocOpen: false
 ---
