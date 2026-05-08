@@ -104,6 +104,12 @@ buildExpired = false
   weight = 20
 
 [[menu.main]]
+  identifier = "glossary"
+  name = "术语"
+  url = "/glossary/"
+  weight = 25
+
+[[menu.main]]
   identifier = "search"
   name = "搜索"
   url = "/search/"

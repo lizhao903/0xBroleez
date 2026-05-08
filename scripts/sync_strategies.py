@@ -29,6 +29,18 @@ IDEAS_DIR = STRATEGY_LIB / "ideas"
 SUMMARIES_DIR = STRATEGY_LIB / "summaries"
 OUTPUT_DIR = REPO_ROOT / "content" / "posts" / "strategies"
 
+# Strategy-Lib 在 GitHub 上的位置，用来生成"看源码"的链接
+STRATEGY_LIB_REPO = "https://github.com/lizhao903/Strategy-Lib"
+STRATEGY_LIB_BRANCH = "main"
+
+
+def repo_url(path_in_repo: str, kind: str = "blob") -> str:
+    """生成指向 Strategy-Lib 仓库内某路径的 GitHub URL。
+
+    kind: "blob" 用于文件（如 idea.md），"tree" 用于目录。
+    """
+    return f"{STRATEGY_LIB_REPO}/{kind}/{STRATEGY_LIB_BRANCH}/{path_in_repo}"
+
 SKIP = {"_template", "README.md"}
 
 
@@ -338,6 +350,9 @@ def build_post(entry: VersionEntry, siblings: list[VersionEntry]) -> tuple[str, 
         "---",
     ]
 
+    idea_repo_path = f"ideas/{entry.strategy_id}/{entry.idea_dir.name}"
+    summary_repo_path = f"summaries/{entry.strategy_id}/{entry.version}"
+
     parts = ["\n".join(fm_lines), ""]
     # 状态 callout：用 HTML 容器配合 CSS 上色，区分好策略 / 差策略
     parts.append(f'<div class="post-callout post-callout-{status_kind}">')
@@ -346,8 +361,11 @@ def build_post(entry: VersionEntry, siblings: list[VersionEntry]) -> tuple[str, 
         f' · 最终化：<code>{finalized}</code>'
     )
     parts.append(
-        f'<br>来源：<code>Strategy-Lib/ideas/{entry.strategy_id}/{entry.idea_dir.name}</code>'
-        f' + <code>Strategy-Lib/summaries/{entry.strategy_id}/{entry.version}</code>'
+        f'<br>源码：'
+        f'<a href="{repo_url(idea_repo_path, "tree")}" target="_blank" rel="noopener">'
+        f'<code>{idea_repo_path}</code></a> + '
+        f'<a href="{repo_url(summary_repo_path, "tree")}" target="_blank" rel="noopener">'
+        f'<code>{summary_repo_path}</code></a>'
     )
     parts.append("</div>")
     parts.append("")
@@ -432,12 +450,31 @@ def build_post(entry: VersionEntry, siblings: list[VersionEntry]) -> tuple[str, 
         parts.append("</details>")
         parts.append("")
 
+    # 「源文件」区块：列出可点击的源 markdown 和脚本文件
+    parts.append("## 源文件")
+    parts.append("")
+    src_files = [
+        (f"{idea_repo_path}/idea.md", "想法 · idea.md", entry.idea_dir / "idea.md"),
+        (f"{idea_repo_path}/notes.md", "讨论笔记 · notes.md", entry.idea_dir / "notes.md"),
+        (f"{summary_repo_path}/conclusion.md", "结论 · conclusion.md", entry.summary_dir / "conclusion.md"),
+        (f"{summary_repo_path}/implementation.md", "实现 · implementation.md", entry.summary_dir / "implementation.md"),
+        (f"{summary_repo_path}/validation.md", "验证 · validation.md", entry.summary_dir / "validation.md"),
+        (f"{summary_repo_path}/validate.py", "可复跑脚本 · validate.py", entry.summary_dir / "validate.py"),
+    ]
+    for repo_path, label, local_path in src_files:
+        if local_path.exists():
+            parts.append(f"- [{label}]({repo_url(repo_path, 'blob')})")
+    parts.append(
+        f"- [本版本目录（含 artifacts）]({repo_url(summary_repo_path, 'tree')})"
+    )
+    parts.append("")
+
     parts.append("---")
     parts.append("")
     parts.append(
         "*本文由 [`scripts/sync_strategies.py`]"
         "(https://github.com/lizhao903/0xBroleez/blob/main/scripts/sync_strategies.py) "
-        "从 Strategy-Lib 同步生成。*"
+        f"从 [Strategy-Lib]({STRATEGY_LIB_REPO}) 同步生成。*"
     )
     parts.append("")
 
