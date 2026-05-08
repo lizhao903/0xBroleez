@@ -21,7 +21,7 @@
   {{- $images := .Resources.ByType "image" }}
   {{- if $images }}
   <div class="gallery-photo-grid">
-    {{- range $images.ByName }}
+    {{- range sort $images "Name" "asc" }}
     {{- $thumb := .Fill "640x640 q85" }}
     <a class="gallery-photo" href="{{ .RelPermalink }}" target="_blank" rel="noopener"
        title="{{ .Name }}">
