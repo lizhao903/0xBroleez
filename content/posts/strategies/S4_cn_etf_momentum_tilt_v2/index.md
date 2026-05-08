@@ -2,21 +2,28 @@
 title: "A股 ETF 等权 + 动量倾斜（v2 — 扩池 + shift(1) + 长 lookback + vol-adjust） · v2"
 date: 2026-05-08T09:00:00+08:00
 draft: false
-summary: "**v2 的改进显著有效**（CAGR +5.73pp / Sharpe ×3.7 / MaxDD 减半 vs v1，且首次跑赢 510300 BH +2.6%/yr），**但收益主要来自「扩池 6 → 11」对 S3 baseline 的提升，动量 tilt 信号本身仍未带来 alpha**（v2 vs S3-11 IR=-0.17，α 敏感性中 α=0 仍是最优档）。**Ship v2 配置**，但备注「价值在跨资产分散，而非动量」；status 为 **shipped (pool value, not factor value)**。"
+summary: "✅ **v2 的改进显著有效**（CAGR +5.73pp / Sharpe ×3.7 / MaxDD 减半 vs v1，且首次跑赢 510300 BH +2.6%/yr），**但收益主要来自「扩池 6 → 11」对 S3 baseline 的提升，动量 tilt 信号本身仍未带来 alpha**（v2 vs S3-11 IR=-0.17，α 敏感性中 α=0 仍是最优档）。**Ship v2 配置**，但备注「价值在跨资产分散，而非动量」；status 为 **shipped (pool value, not factor value)**。"
 tags: ['策略复盘', 'momentum', 'rebalance', 'tilt', 'etf', 'cross-asset', 'benchmark_suite_v1', 'v2']
 categories: ["策略复盘"]
 series: ["S4_cn_etf_momentum_tilt"]
+status_kind: positive
+status_label: "shipped (pool value, not factor value)"
 ShowToc: true
 TocOpen: false
 ---
 
-> **状态**：`shipped (pool value, not factor value)` · **最终化**：`2026-05-08`  
-> 来源：`Strategy-Lib/ideas/S4_cn_etf_momentum_tilt/v2` + `Strategy-Lib/summaries/S4_cn_etf_momentum_tilt/v2`
+<div class="post-callout post-callout-positive">
+<span class="status-badge status-positive">✅ shipped (pool value, not factor value)</span> · 最终化：<code>2026-05-08</code>
+<br>来源：<code>Strategy-Lib/ideas/S4_cn_etf_momentum_tilt/v2</code> + <code>Strategy-Lib/summaries/S4_cn_etf_momentum_tilt/v2</code>
+</div>
 
-**本策略的其他版本**
+<div class="versions-nav">
+<div class="versions-nav-title">本策略的其他版本</div>
 
-- [v1]({{< relref "/posts/strategies/S4_cn_etf_momentum_tilt_v1/index.md" >}}) — **搁置 v1**。在 V1 共享基线（6 只宽基/行业 ETF、2020-2024、20 日 lookback、α=1.0、月频再平衡）上，横截面动量倾斜相对 S3 等权基线产生 **-2.56% 年化超额、IR=-0.49、t-stat=-1.08**，统计上未达到显著拒绝零假设，但**所有尝试过的 α 与 lookback 组合方向上一致为负**——属于经济意义上的系统性反向，不是噪音。
-- **v2（本文）** — **v2 的改进显著有效**（CAGR +5.73pp / Sharpe ×3.7 / MaxDD 减半 vs v1，且首次跑赢 510300 BH +2.6%/yr），**但收益主要来自「扩池 6 → 11」对 S3 baseline 的提升，动量 tilt 信号本身仍未带来 alpha**（v2 vs S3-11 IR=-0.17，α 敏感性中 α=0 仍是最优档）。**Ship v2 配置**，但备注「价值在跨资产分散，而非动量」；status 为 **shipped (pool value, not factor value)**。
+- <span class="version-tag version-tag-negative">[v1]({{< relref "/posts/strategies/S4_cn_etf_momentum_tilt_v1/index.md" >}})</span> ❌ — **搁置 v1**。在 V1 共享基线（6 只宽基/行业 ETF、2020-2024、20 日 lookback、α=1.0、月频再平衡）上，横截面动量倾斜相对 S3 等权基线产生 **-2.56% 年化超额、IR=-0.49、t-stat=-1.08**，统计上未达到显著拒绝零假设，但**所有尝试过的 α 与 lookback 组合方向上一致为负**——属于经济意义上的系统性反向，不是噪音。
+- <span class="version-tag version-tag-current">v2</span> **本文** ✅ — **v2 的改进显著有效**（CAGR +5.73pp / Sharpe ×3.7 / MaxDD 减半 vs v1，且首次跑赢 510300 BH +2.6%/yr），**但收益主要来自「扩池 6 → 11」对 S3 baseline 的提升，动量 tilt 信号本身仍未带来 alpha**（v2 vs S3-11 IR=-0.17，α 敏感性中 α=0 仍是最优档）。**Ship v2 配置**，但备注「价值在跨资产分散，而非动量」；status 为 **shipped (pool value, not factor value)**。
+
+</div>
 
 ## 想法（Why）
 

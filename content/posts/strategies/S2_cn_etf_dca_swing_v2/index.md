@@ -2,21 +2,28 @@
 title: "A股 ETF DCA + 阈值再平衡 V2（DCA 优先回流 + 波动率自适应阈值） · v2"
 date: 2026-05-08T09:00:00+08:00
 draft: false
-summary: "「停 DCA 灌入」无法治愈 v1 的高抛/低吸不对称——根因是 5 年里 6 只 ETF 整体偏多头 + 资金长期占在风险池，"
+summary: "❌ 「停 DCA 灌入」无法治愈 v1 的高抛/低吸不对称——根因是 5 年里 6 只 ETF 整体偏多头 + 资金长期占在风险池，"
 tags: ['策略复盘', 'dca', 'rebalance', 'threshold', 'swing', 'cn_etf', 'benchmark_v1', 'asymmetric_fix', 'vol_adaptive']
 categories: ["策略复盘"]
 series: ["S2_cn_etf_dca_swing"]
+status_kind: negative
+status_label: "shelved"
 ShowToc: true
 TocOpen: false
 ---
 
-> **状态**：`shelved` · **最终化**：`2026-05-08`  
-> 来源：`Strategy-Lib/ideas/S2_cn_etf_dca_swing/v2` + `Strategy-Lib/summaries/S2_cn_etf_dca_swing/v2`
+<div class="post-callout post-callout-negative">
+<span class="status-badge status-negative">❌ shelved</span> · 最终化：<code>2026-05-08</code>
+<br>来源：<code>Strategy-Lib/ideas/S2_cn_etf_dca_swing/v2</code> + <code>Strategy-Lib/summaries/S2_cn_etf_dca_swing/v2</code>
+</div>
 
-**本策略的其他版本**
+<div class="versions-nav">
+<div class="versions-nav-title">本策略的其他版本</div>
 
-- [v1]({{< relref "/posts/strategies/S2_cn_etf_dca_swing_v1/index.md" >}}) — S2 在 2020-2024 跑出 +1.11% 年化 alpha、信息比率 0.11、最大回撤优于 BH 7.6 pct，
-- **v2（本文）** — 「停 DCA 灌入」无法治愈 v1 的高抛/低吸不对称——根因是 5 年里 6 只 ETF 整体偏多头 + 资金长期占在风险池，
+- <span class="version-tag version-tag-negative">[v1]({{< relref "/posts/strategies/S2_cn_etf_dca_swing_v1/index.md" >}})</span> ❌ — S2 在 2020-2024 跑出 +1.11% 年化 alpha、信息比率 0.11、最大回撤优于 BH 7.6 pct，
+- <span class="version-tag version-tag-current">v2</span> **本文** ❌ — 「停 DCA 灌入」无法治愈 v1 的高抛/低吸不对称——根因是 5 年里 6 只 ETF 整体偏多头 + 资金长期占在风险池，
+
+</div>
 
 ## 想法（Why）
 

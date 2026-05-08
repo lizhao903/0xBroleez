@@ -2,21 +2,28 @@
 title: "A股 ETF 等权 + 趋势倾斜（连续现金 + 波动率过滤 + 债券暴露） · v2"
 date: 2026-05-08T09:00:00+08:00
 draft: false
-summary: "**避险命题数据上兑现（MaxDD -47.8% → -20.5%，2022 -21.6% → -7.6%），但 Sharpe 与 v1 持平、CAGR 倒退 1.35 pct/yr，且 bond overlay 占用 37% 平均仓位让策略漂移成「股债混合」**——v2 实现了「保守型变体」但没有产生新 alpha。状态：**shelved**（保留代码作为 v1 的 risk profile 对照，不推荐替代 v1）。"
+summary: "❌ **避险命题数据上兑现（MaxDD -47.8% → -20.5%，2022 -21.6% → -7.6%），但 Sharpe 与 v1 持平、CAGR 倒退 1.35 pct/yr，且 bond overlay 占用 37% 平均仓位让策略漂移成「股债混合」**——v2 实现了「保守型变体」但没有产生新 alpha。状态：**shelved**（保留代码作为 v1 的 risk profile 对照，不推荐替代 v1）。"
 tags: ['策略复盘', 'benchmark', 'rebalance', 'trend', 'allocation', 'time-series-momentum', 'vol-target', 'defensive']
 categories: ["策略复盘"]
 series: ["S5_cn_etf_trend_tilt"]
+status_kind: negative
+status_label: "shelved"
 ShowToc: true
 TocOpen: false
 ---
 
-> **状态**：`shelved  # 避险命题数据兑现，但 Sharpe 未提升、bond overlay 主导让策略漂移；保留代码作 defensive 对照` · **最终化**：`2026-05-08`  
-> 来源：`Strategy-Lib/ideas/S5_cn_etf_trend_tilt/v2` + `Strategy-Lib/summaries/S5_cn_etf_trend_tilt/v2`
+<div class="post-callout post-callout-negative">
+<span class="status-badge status-negative">❌ shelved</span> · 最终化：<code>2026-05-08</code>
+<br>来源：<code>Strategy-Lib/ideas/S5_cn_etf_trend_tilt/v2</code> + <code>Strategy-Lib/summaries/S5_cn_etf_trend_tilt/v2</code>
+</div>
 
-**本策略的其他版本**
+<div class="versions-nav">
+<div class="versions-nav-title">本策略的其他版本</div>
 
-- [v1]({{< relref "/posts/strategies/S5_cn_etf_trend_tilt_v1/index.md" >}}) — **边际有效但不及预期：搁置（shelved）**。在 2020-2024 样本期 S5 总收益 +20.26% 优于 S3 (+10.80%) 和 510300 BH (+4.18%)，Sharpe 也更高 (0.28 vs 0.21 vs 0.15)，但**核心命题「下行保护」未兑现**——2022 单年 S5 -21.61% 与 BH -21.68% 几乎完全重合，超额主要来自 2024 单年的板块行情。
-- **v2（本文）** — **避险命题数据上兑现（MaxDD -47.8% → -20.5%，2022 -21.6% → -7.6%），但 Sharpe 与 v1 持平、CAGR 倒退 1.35 pct/yr，且 bond overlay 占用 37% 平均仓位让策略漂移成「股债混合」**——v2 实现了「保守型变体」但没有产生新 alpha。状态：**shelved**（保留代码作为 v1 的 risk profile 对照，不推荐替代 v1）。
+- <span class="version-tag version-tag-negative">[v1]({{< relref "/posts/strategies/S5_cn_etf_trend_tilt_v1/index.md" >}})</span> ❌ — **边际有效但不及预期：搁置（shelved）**。在 2020-2024 样本期 S5 总收益 +20.26% 优于 S3 (+10.80%) 和 510300 BH (+4.18%)，Sharpe 也更高 (0.28 vs 0.21 vs 0.15)，但**核心命题「下行保护」未兑现**——2022 单年 S5 -21.61% 与 BH -21.68% 几乎完全重合，超额主要来自 2024 单年的板块行情。
+- <span class="version-tag version-tag-current">v2</span> **本文** ❌ — **避险命题数据上兑现（MaxDD -47.8% → -20.5%，2022 -21.6% → -7.6%），但 Sharpe 与 v1 持平、CAGR 倒退 1.35 pct/yr，且 bond overlay 占用 37% 平均仓位让策略漂移成「股债混合」**——v2 实现了「保守型变体」但没有产生新 alpha。状态：**shelved**（保留代码作为 v1 的 risk profile 对照，不推荐替代 v1）。
+
+</div>
 
 ## 想法（Why）
 

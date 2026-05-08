@@ -2,16 +2,20 @@
 title: "A股 ETF 等权 + 定时再平衡"
 date: 2026-05-08T09:00:00+08:00
 draft: false
-summary: "6 只 A股 ETF 等权 + 月度再平衡 (period=20)，在 2020-01-01 ~ 2024-12-31 跑出"
+summary: "✅ 6 只 A股 ETF 等权 + 月度再平衡 (period=20)，在 2020-01-01 ~ 2024-12-31 跑出"
 tags: ['策略复盘', 'benchmark', 'rebalance', 'equal_weight', 'allocation']
 categories: ["策略复盘"]
 series: ["S3_cn_etf_equal_rebalance"]
+status_kind: positive
+status_label: "shipped"
 ShowToc: true
 TocOpen: false
 ---
 
-> **状态**：`shipped  # 作为 V1 基准组的 baseline，固定下来；S4/S5 在此之上做因子倾斜` · **最终化**：`2026-05-08`  
-> 来源：`Strategy-Lib/ideas/S3_cn_etf_equal_rebalance/v1` + `Strategy-Lib/summaries/S3_cn_etf_equal_rebalance/v1`
+<div class="post-callout post-callout-positive">
+<span class="status-badge status-positive">✅ shipped</span> · 最终化：<code>2026-05-08</code>
+<br>来源：<code>Strategy-Lib/ideas/S3_cn_etf_equal_rebalance/v1</code> + <code>Strategy-Lib/summaries/S3_cn_etf_equal_rebalance/v1</code>
+</div>
 
 ## 想法（Why）
 

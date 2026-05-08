@@ -58,12 +58,20 @@ def parse_frontmatter(text: str) -> Frontmatter:
         if ":" not in line:
             continue
         key, val = line.split(":", 1)
-        key, val = key.strip(), val.strip()
+        key = key.strip()
+        # 去掉 YAML 行内注释（# 之后的部分），但要避免误伤引号里的 #
+        val = val.strip()
+        if val and not (val.startswith('"') or val.startswith("'") or val.startswith("[")):
+            hash_pos = val.find(" #")
+            if hash_pos == -1 and val.startswith("#"):
+                hash_pos = 0
+            if hash_pos != -1:
+                val = val[:hash_pos].rstrip()
         if val.startswith("[") and val.endswith("]"):
             items = [s.strip().strip("'\"") for s in val[1:-1].split(",") if s.strip()]
             fields[key] = items
         else:
-            fields[key] = val
+            fields[key] = val.strip("'\"")
     return Frontmatter(fields, body)
 
 
@@ -165,18 +173,44 @@ def collect_versions() -> list[VersionEntry]:
     return entries
 
 
+def classify_status(status: str) -> str:
+    """把 status 字段分类成 positive / negative / neutral，用于颜色编码。"""
+    s = status.lower()
+    if "shelved" in s or "negative" in s or "rejected" in s:
+        return "negative"
+    if "shipped" in s:
+        return "positive"
+    return "neutral"
+
+
+STATUS_EMOJI = {"positive": "✅", "negative": "❌", "neutral": "⏳"}
+
+
 def render_versions_nav(current: VersionEntry, siblings: list[VersionEntry]) -> str:
-    """生成「本策略其他版本」区块的 markdown。"""
+    """生成「本策略其他版本」区块的 markdown（包含 HTML 包装以便 CSS 美化）。
+
+    用空行分隔 HTML 容器与内部 markdown，让 Goldmark 渲染内部列表。
+    """
     if len(siblings) <= 1:
         return ""
-    lines = ["**本策略的其他版本**", ""]
+    lines = ['<div class="versions-nav">', '<div class="versions-nav-title">本策略的其他版本</div>', ""]
     for sib in siblings:
+        kind = classify_status(sib.status)
+        emoji = STATUS_EMOJI[kind]
         if sib.version == current.version:
-            lines.append(f"- **{sib.version}（本文）** — {sib.one_liner}")
+            lines.append(
+                f'- <span class="version-tag version-tag-current">{sib.version}</span>'
+                f' **本文** {emoji} — {sib.one_liner}'
+            )
         else:
             target = f"{sib.strategy_id}_{sib.version}"
-            link = f"[{sib.version}]({{{{< relref \"/posts/strategies/{target}/index.md\" >}}}})"
-            lines.append(f"- {link} — {sib.one_liner}")
+            link = f'[{sib.version}]({{{{< relref "/posts/strategies/{target}/index.md" >}}}})'
+            lines.append(
+                f'- <span class="version-tag version-tag-{kind}">{link}</span>'
+                f' {emoji} — {sib.one_liner}'
+            )
+    lines.append("")
+    lines.append("</div>")
     return "\n".join(lines)
 
 
@@ -234,26 +268,38 @@ def build_post(entry: VersionEntry, siblings: list[VersionEntry]) -> tuple[str, 
     impl_body = parse_frontmatter(impl_text).body.strip() if impl_text else ""
     valid_body = parse_frontmatter(valid_text).body.strip() if valid_text else ""
 
+    status_kind = classify_status(entry.status)
+    status_emoji = STATUS_EMOJI[status_kind]
+    summary_with_emoji = f"{status_emoji} {entry.one_liner}"
+
     fm_lines = [
         "---",
         f'title: "{display_title}"',
         f"date: {entry.created}T09:00:00+08:00",
         "draft: false",
-        f'summary: "{entry.one_liner}"',
+        f'summary: "{summary_with_emoji}"',
         f"tags: {tags}",
         'categories: ["策略复盘"]',
         f'series: ["{entry.strategy_id}"]',
+        f'status_kind: {status_kind}',
+        f'status_label: "{entry.status}"',
         "ShowToc: true",
         "TocOpen: false",
         "---",
     ]
 
     parts = ["\n".join(fm_lines), ""]
-    parts.append(f"> **状态**：`{entry.status}` · **最终化**：`{finalized}`  ")
+    # 状态 callout：用 HTML 容器配合 CSS 上色，区分好策略 / 差策略
+    parts.append(f'<div class="post-callout post-callout-{status_kind}">')
     parts.append(
-        f"> 来源：`Strategy-Lib/ideas/{entry.strategy_id}/{entry.idea_dir.name}` "
-        f"+ `Strategy-Lib/summaries/{entry.strategy_id}/{entry.version}`"
+        f'<span class="status-badge status-{status_kind}">{status_emoji} {entry.status}</span>'
+        f' · 最终化：<code>{finalized}</code>'
     )
+    parts.append(
+        f'<br>来源：<code>Strategy-Lib/ideas/{entry.strategy_id}/{entry.idea_dir.name}</code>'
+        f' + <code>Strategy-Lib/summaries/{entry.strategy_id}/{entry.version}</code>'
+    )
+    parts.append("</div>")
     parts.append("")
 
     nav = render_versions_nav(entry, siblings)

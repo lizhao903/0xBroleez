@@ -2,16 +2,20 @@
 title: "基础 DCA（货币基金 + 风险资产池等额定投）"
 date: 2026-05-08T09:00:00+08:00
 draft: false
-summary: "在 2020-01 ~ 2024-12 的 A股 ETF 真实样本上，基础 DCA 跑输 510300 BH（CAGR -2.25% vs +0.86%，超额 -14.54%）；"
+summary: "⏳ 在 2020-01 ~ 2024-12 的 A股 ETF 真实样本上，基础 DCA 跑输 510300 BH（CAGR -2.25% vs +0.86%，超额 -14.54%）；"
 tags: ['策略复盘', 'dca', 'benchmark', 'etf', 'passive']
 categories: ["策略复盘"]
 series: ["S1_cn_etf_dca_basic"]
+status_kind: neutral
+status_label: "validating-realdata-done"
 ShowToc: true
 TocOpen: false
 ---
 
-> **状态**：`validating-realdata-done` · **最终化**：`TBD`  
-> 来源：`Strategy-Lib/ideas/S1_cn_etf_dca_basic/v1` + `Strategy-Lib/summaries/S1_cn_etf_dca_basic/v1`
+<div class="post-callout post-callout-neutral">
+<span class="status-badge status-neutral">⏳ validating-realdata-done</span> · 最终化：<code>TBD</code>
+<br>来源：<code>Strategy-Lib/ideas/S1_cn_etf_dca_basic/v1</code> + <code>Strategy-Lib/summaries/S1_cn_etf_dca_basic/v1</code>
+</div>
 
 ## 想法（Why）
 

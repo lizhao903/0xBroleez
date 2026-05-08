@@ -1,0 +1,562 @@
+/* =====================================================
+   0xBroleez 博客自定义样式
+   覆盖在 PaperMod 之上，提升中文阅读体验和技术文章质感。
+   ===================================================== */
+
+/* ---------- 全站字体与节奏 ---------- */
+:root {
+    --content-gap: 22px;
+    --gap: 22px;
+    --radius: 8px;
+    --accent: #4a8bd0;
+    --accent-soft: rgba(74, 139, 208, 0.08);
+}
+
+[data-theme="dark"] {
+    --accent: #5fa3e6;
+    --accent-soft: rgba(95, 163, 230, 0.12);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
+        "Source Han Sans CN", "Noto Sans CJK SC", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* 中文正文行高 + 字号优化 */
+.post-content {
+    font-size: 16.5px;
+    line-height: 1.85;
+}
+
+.post-content p {
+    margin: 1em 0;
+    word-break: break-word;
+}
+
+/* ---------- 首页文章列表卡片化 ---------- */
+.post-entry {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 26px 22px 30px;
+    margin-bottom: 18px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease,
+        border-color 0.18s ease;
+    background: var(--entry);
+    position: relative;
+    overflow: hidden;
+}
+
+.post-entry::before {
+    /* 左侧 4px 色条：默认透明，按状态着色 */
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+}
+
+.post-entry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    border-color: var(--accent);
+}
+
+[data-theme="dark"] .post-entry:hover {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+}
+
+/* 按 status_kind 上色 */
+.post-entry-positive::before {
+    background: linear-gradient(180deg, #28b46e, #1f8a52);
+}
+
+.post-entry-negative::before {
+    background: linear-gradient(180deg, #e85050, #b03e3e);
+}
+
+.post-entry-neutral::before {
+    background: var(--secondary);
+}
+
+/* 卡片右上角的状态图标，提供第二重视觉信号 */
+.post-entry-positive::after,
+.post-entry-negative::after,
+.post-entry-neutral::after {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    line-height: 1.4;
+    z-index: 2;
+}
+
+.post-entry-positive::after {
+    content: "✅ 已上线";
+    background: rgba(40, 180, 110, 0.15);
+    color: #1f8a52;
+}
+
+.post-entry-negative::after {
+    content: "❌ 搁置";
+    background: rgba(232, 80, 80, 0.15);
+    color: #b03e3e;
+}
+
+.post-entry-neutral::after {
+    content: "⏳ 验证中";
+    background: rgba(180, 180, 180, 0.20);
+    color: var(--secondary);
+}
+
+[data-theme="dark"] .post-entry-positive::after {
+    background: rgba(74, 222, 128, 0.18);
+    color: #6ee7a3;
+}
+
+[data-theme="dark"] .post-entry-negative::after {
+    background: rgba(248, 113, 113, 0.18);
+    color: #fca5a5;
+}
+
+/* 给卡片标题留出右侧角标空间 */
+.post-entry[class*="post-entry-"] .entry-header h2 {
+    padding-right: 90px;
+}
+
+.post-entry .entry-header h2 {
+    font-size: 22px;
+    line-height: 1.45;
+    margin-bottom: 10px;
+}
+
+.post-entry .entry-content {
+    color: var(--secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 8px 0 12px;
+    -webkit-line-clamp: 3;
+}
+
+.post-entry .entry-footer {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--secondary);
+}
+
+/* 首篇 home-info 居中介绍区 */
+.first-entry {
+    margin-bottom: 32px;
+    padding: 28px;
+    border-radius: var(--radius);
+    background: var(--entry);
+    border: 1px solid var(--border);
+}
+
+/* ---------- 文章详情页 ---------- */
+.post-title {
+    font-size: 36px;
+    line-height: 1.3;
+    margin-bottom: 8px;
+}
+
+.post-meta {
+    font-size: 14px;
+    color: var(--secondary);
+    margin-bottom: 24px;
+}
+
+/* H2 — 章节大标题，带分隔线 */
+.post-content h2 {
+    margin-top: 2.4em;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--tertiary);
+    font-size: 22px;
+}
+
+.post-content h3 {
+    margin-top: 1.8em;
+    font-size: 18px;
+}
+
+.post-content h4 {
+    margin-top: 1.5em;
+    font-size: 16px;
+    color: var(--secondary);
+}
+
+/* ---------- 引用块（callout） ---------- */
+.post-content blockquote {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 12px 18px;
+    margin: 18px 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--content);
+}
+
+.post-content blockquote p {
+    margin: 0.4em 0;
+}
+
+/* 顶部第一个 blockquote 当作"状态摘要"用 */
+.post-content > blockquote:first-of-type {
+    font-size: 0.95em;
+    margin-top: 0;
+    margin-bottom: 28px;
+}
+
+/* ---------- 状态 callout（区分好/差策略） ---------- */
+.post-callout {
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    margin: 0 0 28px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    border-left: 4px solid;
+}
+
+.post-callout-positive {
+    background: rgba(40, 180, 110, 0.08);
+    border-left-color: #28b46e;
+    color: var(--content);
+}
+
+.post-callout-negative {
+    background: rgba(232, 80, 80, 0.08);
+    border-left-color: #e85050;
+    color: var(--content);
+}
+
+.post-callout-neutral {
+    background: rgba(180, 180, 180, 0.10);
+    border-left-color: var(--secondary);
+    color: var(--content);
+}
+
+[data-theme="dark"] .post-callout-positive {
+    background: rgba(74, 222, 128, 0.10);
+    border-left-color: #4ade80;
+}
+
+[data-theme="dark"] .post-callout-negative {
+    background: rgba(248, 113, 113, 0.10);
+    border-left-color: #f87171;
+}
+
+/* 状态徽章（圆角胶囊） */
+.status-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.status-positive {
+    background: rgba(40, 180, 110, 0.18);
+    color: #1f8a52;
+}
+
+.status-negative {
+    background: rgba(232, 80, 80, 0.18);
+    color: #b03e3e;
+}
+
+.status-neutral {
+    background: rgba(180, 180, 180, 0.20);
+    color: var(--secondary);
+}
+
+[data-theme="dark"] .status-positive {
+    background: rgba(74, 222, 128, 0.20);
+    color: #6ee7a3;
+}
+
+[data-theme="dark"] .status-negative {
+    background: rgba(248, 113, 113, 0.20);
+    color: #fca5a5;
+}
+
+/* ---------- 「本策略的其他版本」版本切换器 ---------- */
+.versions-nav {
+    margin: 24px 0 32px;
+    padding: 16px 20px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+}
+
+.versions-nav-title {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+}
+
+.versions-nav ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.versions-nav li {
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14.5px;
+    list-style: none;
+}
+
+.versions-nav li:last-child {
+    border-bottom: none;
+}
+
+/* 版本胶囊（v1 / v2） */
+.version-tag {
+    display: inline-block;
+    min-width: 32px;
+    padding: 2px 10px;
+    margin-right: 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12.5px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.version-tag a {
+    color: inherit !important;
+    text-decoration: none !important;
+    border: none !important;
+}
+
+.version-tag-current {
+    background: var(--accent);
+    color: white;
+}
+
+.version-tag-positive {
+    background: rgba(40, 180, 110, 0.18);
+    color: #1f8a52;
+    border: 1px solid rgba(40, 180, 110, 0.4);
+}
+
+.version-tag-negative {
+    background: rgba(232, 80, 80, 0.15);
+    color: #b03e3e;
+    border: 1px solid rgba(232, 80, 80, 0.35);
+}
+
+.version-tag-neutral {
+    background: var(--tertiary);
+    color: var(--primary);
+    border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .version-tag-positive {
+    background: rgba(74, 222, 128, 0.18);
+    color: #6ee7a3;
+}
+
+[data-theme="dark"] .version-tag-negative {
+    background: rgba(248, 113, 113, 0.18);
+    color: #fca5a5;
+}
+
+.version-tag-positive:hover,
+.version-tag-negative:hover,
+.version-tag-neutral:hover {
+    transform: translateY(-1px);
+    transition: transform 0.15s ease;
+}
+
+/* ---------- 折叠区 details/summary ---------- */
+.post-content details {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 22px 0;
+    background: var(--code-block-bg);
+    overflow: hidden;
+    transition: background 0.18s ease;
+}
+
+.post-content details summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    font-weight: 600;
+    color: var(--primary);
+    user-select: none;
+    list-style: none;
+    position: relative;
+    padding-left: 40px;
+    transition: background 0.15s ease;
+}
+
+.post-content details summary::-webkit-details-marker {
+    display: none;
+}
+
+.post-content details summary::before {
+    content: "▸";
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 14px;
+    transition: transform 0.2s ease;
+}
+
+.post-content details[open] > summary::before {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.post-content details summary:hover {
+    background: var(--accent-soft);
+}
+
+.post-content details[open] {
+    background: var(--theme);
+}
+
+.post-content details[open] > summary {
+    border-bottom: 1px solid var(--border);
+    background: var(--code-block-bg);
+}
+
+.post-content details > *:not(summary) {
+    padding: 0 20px;
+}
+
+.post-content details > *:nth-child(2) {
+    padding-top: 16px;
+}
+
+.post-content details > *:last-child {
+    padding-bottom: 16px;
+}
+
+/* ---------- 图片 ---------- */
+.post-content img {
+    border-radius: var(--radius);
+    margin: 22px auto;
+    display: block;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    max-width: 100%;
+    height: auto;
+}
+
+[data-theme="dark"] .post-content img {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- 表格 ---------- */
+.post-content table {
+    margin: 18px 0;
+    border-collapse: collapse;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    width: 100%;
+    font-size: 14.5px;
+}
+
+.post-content table thead th {
+    background: var(--code-block-bg);
+    font-weight: 600;
+    color: var(--primary);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+}
+
+.post-content table tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.post-content table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.post-content table tbody tr:hover {
+    background: var(--accent-soft);
+}
+
+/* ---------- 行内代码 ---------- */
+.post-content :not(pre) > code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--primary);
+}
+
+/* ---------- 链接 ---------- */
+.post-content a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+.post-content a:hover {
+    border-bottom-color: var(--accent);
+}
+
+/* ---------- 列表 ---------- */
+.post-content ul,
+.post-content ol {
+    padding-left: 1.6em;
+}
+
+.post-content li {
+    margin: 0.4em 0;
+}
+
+.post-content li > p {
+    margin: 0.4em 0;
+}
+
+/* ---------- 任务列表 ---------- */
+.post-content input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: var(--accent);
+}
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 720px) {
+    .post-content {
+        font-size: 16px;
+    }
+
+    .post-title {
+        font-size: 28px;
+    }
+
+    .post-entry {
+        padding: 18px 20px;
+    }
+
+    .post-content table {
+        font-size: 13px;
+    }
+
+    .post-content table th,
+    .post-content table td {
+        padding: 8px 10px;
+    }
+}
