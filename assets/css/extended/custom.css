@@ -5,11 +5,30 @@
 
 /* ---------- 全站字体与节奏 ---------- */
 :root {
+    --main-width: 1140px;          /* 总体宽度（PaperMod 默认 720） */
+    --post-content-width: 760px;   /* 详情页正文宽度，保持阅读体验 */
+    --sidebar-width: 280px;
+    --sidebar-gap: 36px;
     --content-gap: 22px;
     --gap: 22px;
     --radius: 8px;
     --accent: #4a8bd0;
     --accent-soft: rgba(74, 139, 208, 0.08);
+}
+
+/* 详情页正文不要随主容器拉满 */
+.post-single .post-content,
+.post-single .post-title,
+.post-single .post-description,
+.post-single .post-meta,
+.post-single .toc,
+.post-single .post-footer,
+.post-single .share-buttons,
+.post-single .paginav,
+.post-single .author {
+    max-width: var(--post-content-width);
+    margin-left: auto;
+    margin-right: auto;
 }
 
 [data-theme="dark"] {
@@ -537,7 +556,179 @@ body {
     accent-color: var(--accent);
 }
 
+/* ---------- 首页两栏布局：主列 + 标签/分类侧栏 ---------- */
+.home-grid {
+    display: grid;
+    grid-template-columns: 1fr var(--sidebar-width);
+    gap: var(--sidebar-gap);
+    align-items: start;
+}
+
+.home-main {
+    min-width: 0; /* 防止内部 flex/grid item 撑爆 */
+}
+
+.home-sidebar {
+    position: sticky;
+    top: 80px; /* 滚动时跟随，离顶部留位置 */
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-self: start;
+}
+
+.sidebar-section {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+}
+
+.sidebar-title {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.sidebar-list li {
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar-list li a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    margin: 2px -10px;
+    border-radius: 6px;
+    color: var(--primary);
+    text-decoration: none !important;
+    border: none !important;
+    font-size: 14.5px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-list li a:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.sidebar-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.sidebar-count {
+    flex-shrink: 0;
+    background: var(--tertiary);
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 999px;
+    min-width: 22px;
+    text-align: center;
+}
+
+.sidebar-list li a:hover .sidebar-count {
+    background: var(--accent);
+    color: white;
+}
+
+/* 标签云：横向胶囊布局 */
+.sidebar-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sidebar-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--code-block-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--primary);
+    text-decoration: none !important;
+    font-size: 13px;
+    transition: all 0.15s ease;
+}
+
+.sidebar-tag:hover {
+    background: var(--accent);
+    color: white !important;
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.sidebar-tag .sidebar-count {
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--secondary);
+    padding: 0 6px;
+    font-size: 11.5px;
+    min-width: 18px;
+}
+
+[data-theme="dark"] .sidebar-tag .sidebar-count {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.sidebar-tag:hover .sidebar-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+/* 归档链接 */
+.sidebar-section-archive {
+    background: transparent;
+    border: 1px dashed var(--border);
+    text-align: center;
+}
+
+.sidebar-archive-link {
+    color: var(--secondary);
+    text-decoration: none !important;
+    font-size: 14px;
+}
+
+.sidebar-archive-link:hover {
+    color: var(--accent);
+}
+
 /* ---------- 移动端 ---------- */
+@media (max-width: 960px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-sidebar {
+        position: static;
+        order: 2;
+        margin-top: 24px;
+    }
+
+    .home-main {
+        order: 1;
+    }
+}
+
 @media (max-width: 720px) {
     .post-content {
         font-size: 16px;

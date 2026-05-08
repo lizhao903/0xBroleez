@@ -51,6 +51,12 @@
 {{- partial "home_info.html" . }}
 {{- end }}
 
+{{/* —————— 首页才用「主+侧栏」两栏布局，其他列表页保持单栏 —————— */}}
+{{- if .IsHome }}
+<div class="home-grid">
+  <div class="home-main">
+{{- end }}
+
 {{- $term := .Data.Term }}
 {{- range $index, $page := $paginator.Pages }}
 
@@ -98,7 +104,7 @@
 <footer class="page-footer">
   <nav class="pagination">
     {{- if $paginator.HasPrev }}
-    <a class="prev" href="{{ $paginator.Prev.URL | absURL }}">
+    <a class="prev" href="{{ $paginator.Prev.URL | relURL}}">
       «&nbsp;{{ i18n "prev_page" }}&nbsp;
       {{- if (.Param "ShowPageNums") }}
       {{- sub $paginator.PageNumber 1 }}/{{ $paginator.TotalPages }}
@@ -106,7 +112,7 @@
     </a>
     {{- end }}
     {{- if $paginator.HasNext }}
-    <a class="next" href="{{ $paginator.Next.URL | absURL }}">
+    <a class="next" href="{{ $paginator.Next.URL | relURL}}">
       {{- i18n "next_page" }}&nbsp;
       {{- if (.Param "ShowPageNums") }}
       {{- add 1 $paginator.PageNumber }}/{{ $paginator.TotalPages }}
@@ -115,6 +121,72 @@
     {{- end }}
   </nav>
 </footer>
+{{- end }}
+
+{{- if .IsHome }}
+  </div>{{/* /.home-main */}}
+
+  <aside class="home-sidebar">
+    {{- with .Site.Taxonomies.categories }}
+    <section class="sidebar-section">
+      <h3 class="sidebar-title">分类</h3>
+      <ul class="sidebar-list sidebar-list-categories">
+        {{- range $name, $taxonomy := . }}
+        {{- with $.Site.GetPage (printf "/categories/%s" $name) }}
+        <li>
+          <a href="{{ .Permalink }}">
+            <span class="sidebar-name">{{ $name }}</span>
+            <span class="sidebar-count">{{ len $taxonomy }}</span>
+          </a>
+        </li>
+        {{- end }}
+        {{- end }}
+      </ul>
+    </section>
+    {{- end }}
+
+    {{- with .Site.Taxonomies.tags }}
+    <section class="sidebar-section">
+      <h3 class="sidebar-title">标签</h3>
+      <div class="sidebar-tags">
+        {{- range $name, $taxonomy := . }}
+        {{- with $.Site.GetPage (printf "/tags/%s" $name) }}
+        <a class="sidebar-tag" href="{{ .Permalink }}">
+          {{ $name }}<span class="sidebar-count">{{ len $taxonomy }}</span>
+        </a>
+        {{- end }}
+        {{- end }}
+      </div>
+    </section>
+    {{- end }}
+
+    {{- with .Site.Taxonomies.series }}
+    <section class="sidebar-section">
+      <h3 class="sidebar-title">策略系列</h3>
+      <ul class="sidebar-list">
+        {{- range $name, $taxonomy := . }}
+        {{- with $.Site.GetPage (printf "/series/%s" $name) }}
+        <li>
+          <a href="{{ .Permalink }}">
+            <span class="sidebar-name">{{ $name }}</span>
+            <span class="sidebar-count">{{ len $taxonomy }}</span>
+          </a>
+        </li>
+        {{- end }}
+        {{- end }}
+      </ul>
+    </section>
+    {{- end }}
+
+    <section class="sidebar-section sidebar-section-archive">
+      {{- with .Site.GetPage "/archives" }}
+      <a class="sidebar-archive-link" href="{{ .Permalink }}">
+        归档浏览全部 →
+      </a>
+      {{- end }}
+    </section>
+  </aside>
+</div>{{/* /.home-grid */}}
 {{- end }}
 
 {{- end }}{{/* end profileMode */}}
